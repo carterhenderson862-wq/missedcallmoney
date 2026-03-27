@@ -1,28 +1,84 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useRef } from "react";
-import { Bot, User, Send, ArrowRight } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Bot, User, Send, ArrowRight, RotateCcw, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface Message {
   role: "bot" | "customer";
   text: string;
-  delay: number;
+  time: string;
 }
 
 const conversation: Message[] = [
-  { role: "bot", text: "Hey—this is Austin Plumbing. Sorry we missed your call. What's going on?", delay: 0 },
-  { role: "customer", text: "My AC isn't working", delay: 1400 },
-  { role: "bot", text: "Got it—is it completely out or just not cooling well?", delay: 2800 },
-  { role: "customer", text: "Completely out", delay: 4200 },
-  { role: "bot", text: "Okay—that's urgent. We can get someone out today. Are you available this afternoon?", delay: 5600 },
-  { role: "customer", text: "Yes", delay: 7000 },
-  { role: "bot", text: "Perfect—you're booked for 3pm today. 🔧", delay: 8400 },
+  { role: "bot", text: "Hey! This is Austin Plumbing 👋 Sorry we missed your call — what's going on?", time: "2:14 PM" },
+  { role: "customer", text: "My AC isn't working", time: "2:14 PM" },
+  { role: "bot", text: "Oh no, is it totally out or just not blowing cold?", time: "2:15 PM" },
+  { role: "customer", text: "Completely out", time: "2:15 PM" },
+  { role: "bot", text: "Ugh that's rough, especially in this heat 😅 We actually have a slot open today — would this afternoon work for you?", time: "2:16 PM" },
+  { role: "customer", text: "Yes", time: "2:16 PM" },
+  { role: "bot", text: "Perfect! Locking you in for 3pm. You'll get a confirmation text shortly 👍", time: "2:17 PM" },
 ];
 
 const ChatDemo = () => {
   const [visibleMessages, setVisibleMessages] = useState<number>(0);
-  const [hasPlayed, setHasPlayed] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [showBooked, setShowBooked] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [visibleMessages, isTyping, showBooked]);
+
+  const clearTimeouts = () => {
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+  };
+
+  const playConversation = useCallback(() => {
+    clearTimeouts();
+    setVisibleMessages(0);
+    setIsTyping(false);
+    setShowBooked(false);
+    setIsPlaying(true);
+
+    let cumulativeDelay = 400;
+
+    conversation.forEach((msg, i) => {
+      // Show typing indicator before bot messages
+      if (msg.role === "bot") {
+        const typingDelay = i === 0 ? 800 : 1200 + Math.random() * 800;
+        const t1 = setTimeout(() => setIsTyping(true), cumulativeDelay);
+        timeoutsRef.current.push(t1);
+        cumulativeDelay += typingDelay;
+      } else {
+        // Customer messages have a shorter delay
+        cumulativeDelay += 600 + Math.random() * 400;
+      }
+
+      const t2 = setTimeout(() => {
+        setIsTyping(false);
+        setVisibleMessages(i + 1);
+      }, cumulativeDelay);
+      timeoutsRef.current.push(t2);
+
+      // Small gap after each message
+      cumulativeDelay += 400;
+    });
+
+    // Show booked badge after last message
+    const t3 = setTimeout(() => {
+      setShowBooked(true);
+      setIsPlaying(false);
+    }, cumulativeDelay + 600);
+    timeoutsRef.current.push(t3);
+  }, []);
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -30,21 +86,23 @@ const ChatDemo = () => {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasPlayed) {
-          setHasPlayed(true);
-          setVisibleMessages(0);
-
-          conversation.forEach((_, i) => {
-            setTimeout(() => setVisibleMessages(i + 1), conversation[i].delay + 600);
-          });
+        if (entry.isIntersecting && !isPlaying && visibleMessages === 0 && !showBooked) {
+          playConversation();
         }
       },
       { threshold: 0.2 }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasPlayed]);
+    return () => {
+      observer.disconnect();
+      clearTimeouts();
+    };
+  }, [playConversation, isPlaying, visibleMessages, showBooked]);
+
+  const handleReplay = () => {
+    playConversation();
+  };
 
   return (
     <section className="py-[60px] bg-card">
@@ -91,55 +149,80 @@ const ChatDemo = () => {
 
             {/* Messages */}
             <div className="px-4 py-5 space-y-3 min-h-[420px] max-h-[480px] overflow-y-auto">
-              <AnimatePresence>
+              <AnimatePresence mode="popLayout">
                 {conversation.slice(0, visibleMessages).map((msg, i) => (
                   <motion.div
-                    key={i}
+                    key={`msg-${i}`}
                     initial={{ opacity: 0, y: 12, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className={`flex gap-2.5 ${msg.role === "customer" ? "justify-end" : "justify-start"}`}
+                    className={`flex flex-col ${msg.role === "customer" ? "items-end" : "items-start"}`}
                   >
-                    {msg.role === "bot" && (
-                      <div className="w-7 h-7 rounded-full bg-primary/15 flex-shrink-0 flex items-center justify-center mt-0.5">
-                        <Bot className="w-3.5 h-3.5 text-primary" />
+                    <div className={`flex gap-2.5 ${msg.role === "customer" ? "justify-end" : "justify-start"}`}>
+                      {msg.role === "bot" && (
+                        <div className="w-7 h-7 rounded-full bg-primary/15 flex-shrink-0 flex items-center justify-center mt-0.5">
+                          <Bot className="w-3.5 h-3.5 text-primary" />
+                        </div>
+                      )}
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                          msg.role === "customer"
+                            ? "bg-primary text-primary-foreground rounded-br-md"
+                            : "bg-secondary text-secondary-foreground rounded-bl-md"
+                        }`}
+                      >
+                        {msg.text}
                       </div>
-                    )}
-                    <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                        msg.role === "customer"
-                          ? "bg-primary text-primary-foreground rounded-br-md"
-                          : "bg-secondary text-secondary-foreground rounded-bl-md"
-                      }`}
-                    >
-                      {msg.text}
+                      {msg.role === "customer" && (
+                        <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0 flex items-center justify-center mt-0.5">
+                          <User className="w-3.5 h-3.5 text-muted-foreground" />
+                        </div>
+                      )}
                     </div>
-                    {msg.role === "customer" && (
-                      <div className="w-7 h-7 rounded-full bg-muted flex-shrink-0 flex items-center justify-center mt-0.5">
-                        <User className="w-3.5 h-3.5 text-muted-foreground" />
-                      </div>
-                    )}
+                    <span className={`text-[10px] text-muted-foreground/60 mt-1 ${msg.role === "customer" ? "mr-10" : "ml-10"}`}>
+                      {msg.time}
+                    </span>
                   </motion.div>
                 ))}
-              </AnimatePresence>
 
-              {/* Typing indicator */}
-              {visibleMessages > 0 && visibleMessages < conversation.length && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex gap-2.5"
-                >
-                  <div className="w-7 h-7 rounded-full bg-primary/15 flex-shrink-0 flex items-center justify-center">
-                    <Bot className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  <div className="bg-secondary rounded-2xl rounded-bl-md px-4 py-3 flex gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:0ms]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:150ms]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:300ms]" />
-                  </div>
-                </motion.div>
-              )}
+                {/* Typing indicator */}
+                {isTyping && (
+                  <motion.div
+                    key="typing"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex gap-2.5"
+                  >
+                    <div className="w-7 h-7 rounded-full bg-primary/15 flex-shrink-0 flex items-center justify-center">
+                      <Bot className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <div className="bg-secondary rounded-2xl rounded-bl-md px-4 py-3 flex gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:0ms]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:150ms]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50 animate-bounce [animation-delay:300ms]" />
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Job Booked badge */}
+                {showBooked && (
+                  <motion.div
+                    key="booked"
+                    initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="flex justify-center pt-2"
+                  >
+                    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-5 py-2 text-sm font-display font-semibold text-emerald-400">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Job Booked ✓
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <div ref={messagesEndRef} />
             </div>
 
             {/* Input bar */}
@@ -156,8 +239,24 @@ const ChatDemo = () => {
             This happens automatically every time you miss a call.
           </p>
 
-          {/* CTA Button */}
-          <div className="text-center mt-8">
+          {/* Replay + CTA buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+            {showBooked && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={handleReplay}
+                  className="font-display font-medium text-sm px-6 py-5 border-border hover:bg-secondary"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Replay Demo
+                </Button>
+              </motion.div>
+            )}
             <a href="#cta">
               <Button
                 size="lg"
