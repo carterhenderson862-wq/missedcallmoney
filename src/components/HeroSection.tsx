@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
 
-const HeroSection = () => {
+const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
@@ -66,6 +66,7 @@ const HeroSection = () => {
           >
             <Button
               size="lg"
+              onClick={onCTAClick}
               className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-8 py-6 shadow-glow hover:opacity-90 transition-opacity"
             >
               Try this on your next missed call

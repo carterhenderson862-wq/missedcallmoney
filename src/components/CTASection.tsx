@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const CTASection = () => {
+const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
     <section id="cta" className="py-[60px]">
       <div className="container">
@@ -23,6 +23,7 @@ const CTASection = () => {
             </p>
             <Button
               size="lg"
+              onClick={onCTAClick}
               className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-10 py-6 shadow-glow hover:opacity-90 transition-opacity"
             >
               Try it on your calls
