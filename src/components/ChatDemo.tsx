@@ -256,6 +256,9 @@ const ChatDemo = () => {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </a>
+            <p className="text-sm text-muted-foreground/60 mt-3">
+              Takes 2 minutes. Works with your current number. No setup headache.
+            </p>
           </div>
         </motion.div>
       </div>
