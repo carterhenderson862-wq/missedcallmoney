@@ -57,10 +57,10 @@ const ChatDemo = () => {
           className="text-center mb-16"
         >
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            See the agent <span className="text-gradient">in action</span>
+            Watch a <span className="text-gradient">$500 job</span> get booked
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            A real example: missed call from a homeowner with a leaking water heater — booked in under 2 minutes.
+            Missed call → urgent AC repair → booked in under 60 seconds. No staff needed.
           </p>
         </motion.div>
 
