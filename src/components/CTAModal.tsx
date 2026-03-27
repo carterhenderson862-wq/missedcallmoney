@@ -31,7 +31,7 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
     if (!val) {
       setTimeout(() => {
         setSubmitted(false);
-        setForm({ name: "", business: "", phone: "", email: "", industry: "", missedCalls: "" });
+        setForm({ name: "", business: "", phone: "", email: "", industry: "" });
       }, 300);
     }
   };
