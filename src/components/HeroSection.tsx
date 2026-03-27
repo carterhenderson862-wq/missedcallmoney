@@ -33,8 +33,8 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-6"
           >
-            You could be losing thousands every month from{" "}
-            <span className="text-gradient">missed calls.</span>
+            Most businesses miss 30% of their calls.{" "}
+            <span className="text-gradient">We turn those into revenue.</span>
           </motion.h1>
 
           <motion.p
