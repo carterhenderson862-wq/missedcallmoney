@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import HowItWorks from "@/components/HowItWorks";
+import ChatDemo from "@/components/ChatDemo";
 import Differentiators from "@/components/Differentiators";
 import Industries from "@/components/Industries";
 import CTASection from "@/components/CTASection";
@@ -11,6 +12,7 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <HowItWorks />
+      <ChatDemo />
       <Differentiators />
       <Industries />
       <CTASection />
