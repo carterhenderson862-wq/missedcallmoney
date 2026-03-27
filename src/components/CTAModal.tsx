@@ -19,7 +19,6 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
     phone: "",
     email: "",
     industry: "",
-    missedCalls: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -32,7 +31,7 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
     if (!val) {
       setTimeout(() => {
         setSubmitted(false);
-        setForm({ name: "", business: "", phone: "", email: "", industry: "", missedCalls: "" });
+        setForm({ name: "", business: "", phone: "", email: "", industry: "" });
       }, 300);
     }
   };
@@ -88,10 +87,6 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="missed">Estimated missed calls per week <span className="text-muted-foreground">(optional)</span></Label>
-                <Input id="missed" type="number" value={form.missedCalls} onChange={(e) => setForm({ ...form, missedCalls: e.target.value })} />
               </div>
               <Button type="submit" className="mt-2 bg-gradient-primary text-primary-foreground font-display font-semibold shadow-glow hover:opacity-90 transition-opacity">
                 Request Setup
