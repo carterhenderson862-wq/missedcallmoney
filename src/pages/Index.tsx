@@ -12,6 +12,7 @@ const Index = () => {
       <Navbar />
       <HeroSection />
       <HowItWorks />
+      <ChatDemo />
       <Differentiators />
       <Industries />
       <CTASection />
