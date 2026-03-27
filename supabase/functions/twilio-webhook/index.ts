@@ -281,7 +281,7 @@ serve(async (req) => {
     });
 
     // Update lead status
-    const newStatus = isMissedCall ? "contacted" : determineStatus(replyText, lead.status);
+    const newStatus = isMissedCall ? "contacted" : determineStatus(replyText, body, lead.status);
     const updateData: Record<string, unknown> = { status: newStatus };
     
     if (isMissedCall) {
