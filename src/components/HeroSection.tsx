@@ -33,17 +33,26 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-6"
           >
-            You missed 12 calls this week.{" "}
-            <span className="text-gradient">That's $3,600 in lost jobs.</span>
+            Turn missed calls into{" "}
+            <span className="text-gradient">booked jobs</span> automatically.
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl"
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-3 max-w-2xl"
           >
-            We recover those automatically.
+            Miss a call → We text them → You get the job.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
+            className="text-sm text-muted-foreground/70 leading-relaxed mb-10 max-w-2xl"
+          >
+            Most businesses miss 30% of their calls. That's lost revenue.
           </motion.p>
 
           <motion.div
@@ -53,7 +62,7 @@ const HeroSection = () => {
             className="flex flex-col sm:flex-row gap-4"
           >
             <Button size="lg" className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-8 py-6 shadow-glow hover:opacity-90 transition-opacity">
-              Start Recovering Revenue
+              See how this books jobs for you
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <Button variant="outline" size="lg" className="font-display font-medium text-base px-8 py-6 border-border hover:bg-secondary">

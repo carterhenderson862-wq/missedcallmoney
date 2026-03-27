@@ -56,6 +56,9 @@ const ChatDemo = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
+          <p className="text-primary font-display font-semibold text-lg mb-3">
+            Example: $300+ job recovered from a missed call
+          </p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
             Watch a <span className="text-gradient">$500 job</span> get booked
           </h2>
@@ -150,8 +153,8 @@ const ChatDemo = () => {
           </div>
 
           {/* Caption */}
-          <p className="text-center text-xs text-muted-foreground mt-4">
-            Simulated conversation · Actual agent responses vary by business
+          <p className="text-center text-sm text-muted-foreground mt-6 font-medium">
+            This happens automatically every time you miss a call.
           </p>
         </motion.div>
       </div>
