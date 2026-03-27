@@ -23,10 +23,10 @@ const ChatDemo = () => {
   const [visibleMessages, setVisibleMessages] = useState<number>(0);
   const [isTyping, setIsTyping] = useState(false);
   const [showBooked, setShowBooked] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const hasPlayedRef = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -46,19 +46,17 @@ const ChatDemo = () => {
     setVisibleMessages(0);
     setIsTyping(false);
     setShowBooked(false);
-    setIsPlaying(true);
+    hasPlayedRef.current = true;
 
     let cumulativeDelay = 400;
 
     conversation.forEach((msg, i) => {
-      // Show typing indicator before bot messages
       if (msg.role === "bot") {
         const typingDelay = i === 0 ? 800 : 1200 + Math.random() * 800;
         const t1 = setTimeout(() => setIsTyping(true), cumulativeDelay);
         timeoutsRef.current.push(t1);
         cumulativeDelay += typingDelay;
       } else {
-        // Customer messages have a shorter delay
         cumulativeDelay += 600 + Math.random() * 400;
       }
 
@@ -68,14 +66,11 @@ const ChatDemo = () => {
       }, cumulativeDelay);
       timeoutsRef.current.push(t2);
 
-      // Small gap after each message
       cumulativeDelay += 400;
     });
 
-    // Show booked badge after last message
     const t3 = setTimeout(() => {
       setShowBooked(true);
-      setIsPlaying(false);
     }, cumulativeDelay + 600);
     timeoutsRef.current.push(t3);
   }, []);
@@ -86,7 +81,7 @@ const ChatDemo = () => {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !isPlaying && visibleMessages === 0 && !showBooked) {
+        if (entry.isIntersecting && !hasPlayedRef.current) {
           playConversation();
         }
       },
@@ -98,7 +93,7 @@ const ChatDemo = () => {
       observer.disconnect();
       clearTimeouts();
     };
-  }, [playConversation, isPlaying, visibleMessages, showBooked]);
+  }, [playConversation]);
 
   const handleReplay = () => {
     playConversation();
