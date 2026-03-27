@@ -19,7 +19,6 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
     phone: "",
     email: "",
     industry: "",
-    missedCalls: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
