@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { value: "93%", label: "Response rate" },
-  { value: "2.4x", label: "More bookings" },
-  { value: "<30s", label: "Avg reply time" },
+  { value: "62%", label: "of missed callers never call back" },
+  { value: "< 60s", label: "average AI response time" },
+  { value: "$4,200", label: "average monthly revenue recovered" },
 ];
 
 const StatsBar = () => {
@@ -14,14 +14,14 @@ const StatsBar = () => {
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="grid grid-cols-3 divide-x divide-border"
+          className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border"
         >
           {stats.map((stat) => (
-            <div key={stat.label} className="text-center px-4">
-              <div className="font-display text-3xl md:text-4xl font-bold text-gradient">
+            <div key={stat.label} className="text-center px-6 py-4 md:py-0">
+              <span className="font-display text-2xl md:text-3xl font-bold text-gradient">
                 {stat.value}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">{stat.label}</div>
+              </span>{" "}
+              <span className="text-sm text-muted-foreground">{stat.label}</span>
             </div>
           ))}
         </motion.div>
