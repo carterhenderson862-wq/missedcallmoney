@@ -18,7 +18,7 @@ const conversation: Message[] = [
   { role: "bot", text: "Perfect—you're booked for 3pm today.", time: "2:17 PM" },
 ];
 
-const ChatDemo = () => {
+const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   const [visibleMessages, setVisibleMessages] = useState<number>(0);
   const [isTyping, setIsTyping] = useState(false);
   const [showBooked, setShowBooked] = useState(false);
