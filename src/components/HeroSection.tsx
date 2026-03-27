@@ -67,7 +67,7 @@ const HeroSection = () => {
               size="lg"
               className="font-display font-medium text-base px-8 py-6 border-border hover:bg-secondary"
             >
-              See how it works
+              See how it works ↓
             </Button>
           </motion.div>
         </div>

@@ -47,7 +47,7 @@ const ChatDemo = () => {
   }, [hasPlayed]);
 
   return (
-    <section className="py-24 md:py-32 bg-card">
+    <section className="py-[60px] bg-card">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

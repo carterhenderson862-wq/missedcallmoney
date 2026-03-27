@@ -49,6 +49,7 @@ const Testimonials = () => {
               transition={{ delay: i * 0.12 }}
               className="rounded-2xl border border-border bg-card p-8 flex flex-col"
             >
+              <div className="text-primary text-lg mb-3 tracking-wide">★★★★★</div>
               <p className="text-foreground leading-relaxed flex-1 mb-6">
                 "{t.quote}"
               </p>

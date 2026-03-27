@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 const CTASection = () => {
   return (
-    <section className="py-24 md:py-32">
+    <section id="cta" className="py-[60px]">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
