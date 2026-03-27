@@ -33,8 +33,8 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-6"
           >
-            Turn missed calls into{" "}
-            <span className="text-gradient">booked jobs</span> automatically.
+            You could be losing thousands every month from{" "}
+            <span className="text-gradient">missed calls.</span>
           </motion.h1>
 
           <motion.p
@@ -43,9 +43,7 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl"
           >
-            Your AI agent answers every missed call, qualifies the lead,
-            understands the job, and books the appointment — all without
-            hiring another person.
+            We fix that instantly.
           </motion.p>
 
           <motion.div
