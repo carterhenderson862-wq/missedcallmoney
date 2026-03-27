@@ -134,8 +134,9 @@ serve(async (req) => {
     ];
 
     if (isMissedCall) {
-      // Always send this exact first message for missed calls — skip AI
-      const replyText = "Hey—sorry we missed your call. What's going on, is this something urgent?";
+      // Personalized first message using business name
+      const bizName = settings?.business_name || "us";
+      const replyText = `Hey—this is ${bizName}. Sorry we missed your call. What's going on, is this something urgent?`;
 
       // Send SMS via Twilio gateway
       const twilioFrom = settings?.twilio_phone_number;
