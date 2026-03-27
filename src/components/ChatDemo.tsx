@@ -23,16 +23,15 @@ const ChatDemo = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showBooked, setShowBooked] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const hasPlayedRef = useRef(false);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    const container = chatContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [visibleMessages, isTyping, showBooked]);
 
   const clearTimeouts = () => {
