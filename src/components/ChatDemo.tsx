@@ -9,15 +9,15 @@ interface Message {
 }
 
 const conversation: Message[] = [
-  { role: "bot", text: "Hi! I noticed we missed your call to ProFlow Plumbing. How can we help you today?", delay: 0 },
-  { role: "customer", text: "Yeah, my water heater is leaking pretty bad. Needed someone to look at it.", delay: 1200 },
-  { role: "bot", text: "Sorry to hear that — a leaking water heater definitely needs quick attention. Is the leak coming from the bottom of the tank or from a pipe connection?", delay: 2800 },
-  { role: "customer", text: "Bottom of the tank. There's water pooling on the floor.", delay: 4600 },
-  { role: "bot", text: "Got it. That usually means a replacement is needed. How old is the unit — do you know? And is it gas or electric?", delay: 6000 },
-  { role: "customer", text: "It's gas, probably 12-15 years old.", delay: 7800 },
-  { role: "bot", text: "Sounds like it's past its lifespan. We can get a tech out to assess and quote a replacement. We have availability tomorrow morning at 9am or afternoon at 2pm — which works better?", delay: 9200 },
-  { role: "customer", text: "9am works. What's the cost for the visit?", delay: 11000 },
-  { role: "bot", text: "The diagnostic visit is $49, which gets waived if you go ahead with the repair or replacement. I've got you booked for tomorrow at 9am. We'll send a confirmation text shortly! 🔧", delay: 12400 },
+  { role: "bot", text: "Hey—this is Austin Plumbing. Sorry we missed your call. What's going on, is this something urgent?", delay: 0 },
+  { role: "customer", text: "Yeah my AC stopped working completely. House is 90 degrees.", delay: 1400 },
+  { role: "bot", text: "Got it—that sounds urgent. Is it blowing warm air or not turning on at all?", delay: 2800 },
+  { role: "customer", text: "Not turning on at all. Nothing happens.", delay: 4200 },
+  { role: "bot", text: "Sounds like it could be the compressor or a capacitor—tech will know on-site. We can get someone out tomorrow morning. Want me to lock in 9am?", delay: 5600 },
+  { role: "customer", text: "Tomorrow works. How much is it gonna cost?", delay: 7200 },
+  { role: "bot", text: "Depends on the job—tech gives you a quote on-site, no obligation. Most AC fixes run $300–$600. Want me to confirm that 9am slot?", delay: 8600 },
+  { role: "customer", text: "Yeah let's do it.", delay: 10000 },
+  { role: "bot", text: "Perfect—you're booked for 9am tomorrow. We'll see you then. 🔧", delay: 11200 },
 ];
 
 const ChatDemo = () => {
@@ -57,10 +57,10 @@ const ChatDemo = () => {
           className="text-center mb-16"
         >
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            See the agent <span className="text-gradient">in action</span>
+            Watch a <span className="text-gradient">$500 job</span> get booked
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            A real example: missed call from a homeowner with a leaking water heater — booked in under 2 minutes.
+            Missed call → urgent AC repair → booked in under 60 seconds. No staff needed.
           </p>
         </motion.div>
 
@@ -79,7 +79,7 @@ const ChatDemo = () => {
                 <Bot className="w-4.5 h-4.5 text-primary" />
               </div>
               <div>
-                <div className="font-display font-semibold text-sm">ProFlow Plumbing AI</div>
+                <div className="font-display font-semibold text-sm">Austin Plumbing AI</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
                   Online · Avg reply &lt;30s
