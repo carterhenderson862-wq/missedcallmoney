@@ -23,16 +23,15 @@ const ChatDemo = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [showBooked, setShowBooked] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const hasPlayedRef = useRef(false);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    const container = chatContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [visibleMessages, isTyping, showBooked]);
 
   const clearTimeouts = () => {
@@ -137,7 +136,7 @@ const ChatDemo = () => {
             </div>
 
             {/* Messages */}
-            <div className="px-4 py-5 space-y-3 min-h-[420px] max-h-[480px] overflow-y-auto">
+            <div ref={chatContainerRef} className="px-4 py-5 space-y-3 h-[420px] overflow-y-auto">
               <AnimatePresence mode="popLayout">
                 {conversation.slice(0, visibleMessages).map((msg, i) => (
                   <motion.div
@@ -211,7 +210,6 @@ const ChatDemo = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Input bar */}
