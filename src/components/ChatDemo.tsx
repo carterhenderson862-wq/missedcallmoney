@@ -252,12 +252,9 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                 onClick={onCTAClick}
                 className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-8 py-6 shadow-glow hover:opacity-90 transition-opacity"
               >
-                Get This Working For Your Business
+                Try it on your next missed call
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            <p className="text-sm text-muted-foreground/60 mt-3">
-              Takes 2 minutes. Works with your current number. No setup headache.
-            </p>
           </div>
         </motion.div>
       </div>

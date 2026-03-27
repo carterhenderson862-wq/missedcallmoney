@@ -16,7 +16,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar onCTAClick={() => setCtaOpen(true)} />
+      <Navbar />
       <HeroSection onCTAClick={() => setCtaOpen(true)} />
       <BuiltFor />
       <Differentiators />
