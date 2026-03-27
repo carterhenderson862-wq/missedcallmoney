@@ -344,16 +344,31 @@ If they're hesitant: create urgency. "These things usually get worse if you wait
 If they stop responding: move on, don't beg.`;
 }
 
-function determineStatus(reply: string, currentStatus: string): string {
-  const lower = reply.toLowerCase();
-  if (lower.includes("booked") || lower.includes("confirmed") || lower.includes("see you")) {
+function determineStatus(aiReply: string, inboundMsg: string, currentStatus: string): string {
+  const reply = aiReply.toLowerCase();
+  const inbound = inboundMsg.toLowerCase();
+
+  // Customer confirmed booking
+  const confirmWords = ["yes", "yeah", "yep", "sure", "sounds good", "let's do it", "book it", "perfect", "that works", "confirm"];
+  const isBookingContext = currentStatus === "booking";
+  if (isBookingContext && confirmWords.some(w => inbound.includes(w))) {
     return "booked";
   }
-  if (lower.includes("time slot") || lower.includes("available") || lower.includes("schedule")) {
+
+  // AI is offering times / scheduling
+  if (reply.includes("schedule") || reply.includes("time slot") || reply.includes("available") || reply.includes("tomorrow") || reply.includes("today") || reply.includes("lock that in") || reply.includes("squeeze you in")) {
     return "booking";
   }
-  if (currentStatus === "new" || currentStatus === "contacted") {
+
+  // AI confirmed the booking
+  if (reply.includes("booked") || reply.includes("confirmed") || reply.includes("see you") || reply.includes("all set")) {
+    return "booked";
+  }
+
+  // AI is asking qualifying questions
+  if (reply.includes("?")) {
     return "qualifying";
   }
+
   return currentStatus;
 }
