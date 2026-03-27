@@ -124,7 +124,7 @@ serve(async (req) => {
     if (isMissedCall) {
       aiMessages.push({
         role: "user",
-        content: "A customer just called and we missed it. Send them an initial text message to acknowledge the missed call and ask how we can help. Be warm, professional, and concise.",
+        content: "Customer just called and we missed it. Text them back like a busy dispatcher—short, direct, ask what's going on. Example: 'Hey—sorry we missed you. What's going on, is this something urgent?'",
       });
     } else {
       // Include conversation history
