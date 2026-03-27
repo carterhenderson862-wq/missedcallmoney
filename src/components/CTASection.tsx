@@ -30,7 +30,7 @@ const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
               Takes 2 minutes. Works with your current number. No setup headache.
             </p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
