@@ -72,7 +72,7 @@ const HeroSection = () => {
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <p className="text-sm text-muted-foreground/60">
-              Takes 2 minutes. Works on your next missed call.
+              Takes 2 minutes. Works with your current number. No setup headache.
             </p>
           </motion.div>
         </div>

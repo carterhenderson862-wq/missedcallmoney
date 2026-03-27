@@ -28,8 +28,8 @@ const CTASection = () => {
               Try it on your calls
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <p className="mt-6 text-sm text-muted-foreground">
-              Takes 2 minutes. No setup headache.
+            <p className="mt-6 text-sm text-muted-foreground/60">
+              Takes 2 minutes. Works with your current number. No setup headache.
             </p>
           </div>
         </motion.div>
