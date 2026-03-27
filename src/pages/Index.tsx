@@ -1,25 +1,27 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import StatsBar from "@/components/StatsBar";
-import ProblemSection from "@/components/ProblemSection";
+import BuiltFor from "@/components/BuiltFor";
+import Differentiators from "@/components/Differentiators";
 import HowItWorks from "@/components/HowItWorks";
 import ChatDemo from "@/components/ChatDemo";
-import ROICalculator from "@/components/ROICalculator";
-import Testimonials from "@/components/Testimonials";
+import MoneyImpact from "@/components/MoneyImpact";
+import HowToStart from "@/components/HowToStart";
 import CTASection from "@/components/CTASection";
+import TrustFooter from "@/components/TrustFooter";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <HeroSection />
-      <StatsBar />
-      <ProblemSection />
+      <BuiltFor />
+      <Differentiators />
       <HowItWorks />
       <ChatDemo />
-      <ROICalculator />
-      <Testimonials />
+      <MoneyImpact />
+      <HowToStart />
       <CTASection />
+      <TrustFooter />
     </div>
   );
 };

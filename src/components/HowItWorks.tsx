@@ -38,9 +38,6 @@ const HowItWorks = () => {
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
             How it <span className="text-gradient">works</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Three steps. Zero staff needed. Revenue recovered automatically.
-          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6 md:gap-8">
