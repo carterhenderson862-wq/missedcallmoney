@@ -137,7 +137,7 @@ const ChatDemo = () => {
 
             {/* Messages */}
             <div ref={chatContainerRef} className="px-4 py-5 space-y-3 h-[420px] overflow-y-auto">
-              <AnimatePresence mode="popLayout">
+              <AnimatePresence>
                 {conversation.slice(0, visibleMessages).map((msg, i) => (
                   <motion.div
                     key={`msg-${i}`}
