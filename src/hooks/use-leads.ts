@@ -1,0 +1,78 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+export type Lead = {
+  id: string;
+  phone_number: string;
+  customer_name: string | null;
+  service_type: string | null;
+  urgency: string | null;
+  location: string | null;
+  status: string;
+  source: string | null;
+  job_details: Record<string, unknown> | null;
+  booked_at: string | null;
+  booked_slot: string | null;
+  follow_up_count: number | null;
+  next_follow_up_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Message = {
+  id: string;
+  lead_id: string;
+  direction: string;
+  body: string;
+  twilio_sid: string | null;
+  status: string | null;
+  created_at: string;
+};
+
+export function useLeads() {
+  return useQuery({
+    queryKey: ["leads"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("leads")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Lead[];
+    },
+    refetchInterval: 5000,
+  });
+}
+
+export function useMessages(leadId: string | null) {
+  return useQuery({
+    queryKey: ["messages", leadId],
+    queryFn: async () => {
+      if (!leadId) return [];
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("lead_id", leadId)
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data as Message[];
+    },
+    enabled: !!leadId,
+    refetchInterval: 3000,
+  });
+}
+
+export function useSettings() {
+  return useQuery({
+    queryKey: ["business_settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("business_settings")
+        .select("*")
+        .limit(1)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
