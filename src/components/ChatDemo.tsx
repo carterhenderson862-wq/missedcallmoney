@@ -9,15 +9,13 @@ interface Message {
 }
 
 const conversation: Message[] = [
-  { role: "bot", text: "Hey—this is Austin Plumbing. Sorry we missed your call. What's going on, is this something urgent?", delay: 0 },
-  { role: "customer", text: "Yeah my AC stopped working completely. House is 90 degrees.", delay: 1400 },
-  { role: "bot", text: "Got it—that sounds urgent. Is it blowing warm air or not turning on at all?", delay: 2800 },
-  { role: "customer", text: "Not turning on at all. Nothing happens.", delay: 4200 },
-  { role: "bot", text: "Sounds like it could be the compressor or a capacitor—tech will know on-site. We can get someone out tomorrow morning. Want me to lock in 9am?", delay: 5600 },
-  { role: "customer", text: "Tomorrow works. How much is it gonna cost?", delay: 7200 },
-  { role: "bot", text: "Depends on the job—tech gives you a quote on-site, no obligation. Most AC fixes run $300–$600. Want me to confirm that 9am slot?", delay: 8600 },
-  { role: "customer", text: "Yeah let's do it.", delay: 10000 },
-  { role: "bot", text: "Perfect—you're booked for 9am tomorrow. We'll see you then. 🔧", delay: 11200 },
+  { role: "bot", text: "Hey—this is Austin Plumbing. Sorry we missed your call. What's going on?", delay: 0 },
+  { role: "customer", text: "My AC isn't working.", delay: 1400 },
+  { role: "bot", text: "Got it—is it completely out, or blowing warm air?", delay: 2800 },
+  { role: "customer", text: "Yeah, completely out. Nothing turns on.", delay: 4200 },
+  { role: "bot", text: "We can get someone out today. Are you available this afternoon?", delay: 5600 },
+  { role: "customer", text: "Yes, this afternoon works.", delay: 7000 },
+  { role: "bot", text: "Perfect—you're booked for 3pm today. Tech will call when they're on the way. 🔧", delay: 8400 },
 ];
 
 const ChatDemo = () => {
