@@ -186,6 +186,14 @@ serve(async (req) => {
           content: msg.body,
         });
       }
+
+      // If urgent, add directive to prioritize fast scheduling
+      if (isUrgent) {
+        aiMessages.push({
+          role: "system",
+          content: "URGENT JOB DETECTED. Treat this as high priority. Respond with urgency, acknowledge the problem, and push to schedule ASAP. Example: \"Got it—that sounds urgent. Want me to get you scheduled ASAP?\" Keep it to 1-2 sentences.",
+        });
+      }
     }
 
     // Call Lovable AI for response
