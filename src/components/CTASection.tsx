@@ -23,6 +23,7 @@ const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             </p>
             <Button
               size="lg"
+              onClick={onCTAClick}
               className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-10 py-6 shadow-glow hover:opacity-90 transition-opacity"
             >
               Try it on your calls

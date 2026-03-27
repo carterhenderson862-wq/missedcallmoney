@@ -66,6 +66,7 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
           >
             <Button
               size="lg"
+              onClick={onCTAClick}
               className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-8 py-6 shadow-glow hover:opacity-90 transition-opacity"
             >
               Try this on your next missed call
