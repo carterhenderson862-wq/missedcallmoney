@@ -10,12 +10,12 @@ interface Message {
 
 const conversation: Message[] = [
   { role: "bot", text: "Hey—this is Austin Plumbing. Sorry we missed your call. What's going on?", delay: 0 },
-  { role: "customer", text: "My AC isn't working.", delay: 1400 },
-  { role: "bot", text: "Got it—is it completely out, or blowing warm air?", delay: 2800 },
-  { role: "customer", text: "Yeah, completely out. Nothing turns on.", delay: 4200 },
-  { role: "bot", text: "We can get someone out today. Are you available this afternoon?", delay: 5600 },
-  { role: "customer", text: "Yes, this afternoon works.", delay: 7000 },
-  { role: "bot", text: "Perfect—you're booked for 3pm today. Tech will call when they're on the way. 🔧", delay: 8400 },
+  { role: "customer", text: "My AC isn't working", delay: 1400 },
+  { role: "bot", text: "Got it—is it completely out or just not cooling well?", delay: 2800 },
+  { role: "customer", text: "Completely out", delay: 4200 },
+  { role: "bot", text: "Okay—that's urgent. We can get someone out today. Are you available this afternoon?", delay: 5600 },
+  { role: "customer", text: "Yes", delay: 7000 },
+  { role: "bot", text: "Perfect—you're booked for 3pm today. 🔧", delay: 8400 },
 ];
 
 const ChatDemo = () => {
