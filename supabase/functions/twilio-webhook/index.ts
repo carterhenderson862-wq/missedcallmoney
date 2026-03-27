@@ -87,6 +87,10 @@ serve(async (req) => {
       });
     }
 
+    // Detect urgency from inbound message
+    const URGENT_KEYWORDS = ["leak", "leaking", "flood", "flooding", "urgent", "emergency", "no ac", "no heat", "broken", "burst", "backed up", "gas smell", "sparking", "no power", "no water", "overflowing"];
+    const isUrgent = isInboundSms && URGENT_KEYWORDS.some(kw => body.toLowerCase().includes(kw));
+
     // If inbound SMS, save the message
     if (isInboundSms) {
       await supabase.from("messages").insert({
@@ -95,9 +99,12 @@ serve(async (req) => {
         body: body,
       });
 
-      // Update lead status
-      if (lead.status === "new") {
-        await supabase.from("leads").update({ status: "qualifying" }).eq("id", lead.id);
+      // Update lead status + urgency flag
+      const leadUpdate: Record<string, unknown> = {};
+      if (lead.status === "new") leadUpdate.status = "qualifying";
+      if (isUrgent) leadUpdate.urgency = "high";
+      if (Object.keys(leadUpdate).length > 0) {
+        await supabase.from("leads").update(leadUpdate).eq("id", lead.id);
       }
     }
 
