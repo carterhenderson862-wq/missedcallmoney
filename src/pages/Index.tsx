@@ -4,6 +4,7 @@ import HeroSection from "@/components/HeroSection";
 import BuiltFor from "@/components/BuiltFor";
 import Differentiators from "@/components/Differentiators";
 import HowItWorks from "@/components/HowItWorks";
+import RealResult from "@/components/RealResult";
 import ChatDemo from "@/components/ChatDemo";
 import MoneyImpact from "@/components/MoneyImpact";
 import HowToStart from "@/components/HowToStart";
@@ -21,6 +22,7 @@ const Index = () => {
       <BuiltFor />
       <Differentiators />
       <HowItWorks />
+      <RealResult />
       <ChatDemo onCTAClick={() => setCtaOpen(true)} />
       <MoneyImpact />
       <HowToStart />
