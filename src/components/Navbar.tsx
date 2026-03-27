@@ -1,5 +1,4 @@
 import { Phone } from "lucide-react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
@@ -10,16 +9,9 @@ const Navbar = () => {
           <Phone className="w-5 h-5 text-primary" />
           <span>CallRecover</span>
         </div>
-        <div className="flex items-center gap-3">
-          <Link to="/dashboard">
-            <Button variant="outline" size="sm" className="font-display font-medium">
-              Dashboard
-            </Button>
-          </Link>
-          <Button size="sm" className="bg-gradient-primary text-primary-foreground font-display font-medium shadow-glow hover:opacity-90 transition-opacity">
-            Get Started
-          </Button>
-        </div>
+        <Button size="sm" className="bg-gradient-primary text-primary-foreground font-display font-medium shadow-glow hover:opacity-90 transition-opacity">
+          Book a Demo
+        </Button>
       </div>
     </nav>
   );
