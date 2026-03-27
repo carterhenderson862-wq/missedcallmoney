@@ -9,6 +9,22 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
 
+// Hardcoded follow-up sequence — each message + delay to next
+const FOLLOW_UP_SEQUENCE = [
+  {
+    message: "Hey—just checking back in. Still need help with this?",
+    delayToNextMs: 55 * 60 * 1000, // ~55 min (so next fires ~1hr after initial)
+  },
+  {
+    message: "We can get someone out today or tomorrow—want me to lock that in?",
+    delayToNextMs: 23 * 60 * 60 * 1000, // ~23 hrs (so next fires ~next day)
+  },
+  {
+    message: "Following up—do you still need help or should I close this out?",
+    delayToNextMs: null, // final message
+  },
+];
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -24,7 +40,6 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get all leads due for follow-up
     const now = new Date().toISOString();
     const { data: leads, error } = await supabase
       .from("leads")
@@ -41,19 +56,19 @@ serve(async (req) => {
       });
     }
 
-    // Get business settings
     const { data: settings } = await supabase
       .from("business_settings")
       .select("*")
       .limit(1)
       .single();
 
-    const maxFollowUps = settings?.max_follow_ups || 3;
     const results: Array<{ leadId: string; status: string }> = [];
 
     for (const lead of leads) {
-      // Check if max follow-ups reached
-      if (lead.follow_up_count >= maxFollowUps) {
+      const stepIndex = lead.follow_up_count || 0;
+
+      // Past the sequence — mark as no_response
+      if (stepIndex >= FOLLOW_UP_SEQUENCE.length) {
         await supabase.from("leads").update({
           status: "no_response",
           next_follow_up_at: null,
@@ -62,54 +77,8 @@ serve(async (req) => {
         continue;
       }
 
-      // Get conversation history
-      const { data: messageHistory } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("lead_id", lead.id)
-        .order("created_at", { ascending: true });
-
-      // Build AI prompt for follow-up
-      const aiMessages = [
-        {
-          role: "system",
-          content: `You are following up with a customer who hasn't responded to ${settings?.business_name || "our"} outreach. This is follow-up #${lead.follow_up_count + 1}. Be brief, friendly, and create urgency without being pushy. One or two sentences max.`,
-        },
-        ...((messageHistory || []).map((msg) => ({
-          role: msg.direction === "inbound" ? "user" : "assistant",
-          content: msg.body,
-        }))),
-        {
-          role: "user",
-          content: `The customer hasn't responded. Send a brief, natural follow-up message. Follow-up #${lead.follow_up_count + 1} of ${maxFollowUps}.`,
-        },
-      ];
-
-      // Get AI response
-      const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: aiMessages,
-        }),
-      });
-
-      if (!aiResponse.ok) {
-        console.error(`AI error for lead ${lead.id}: ${aiResponse.status}`);
-        results.push({ leadId: lead.id, status: "ai_error" });
-        continue;
-      }
-
-      const aiData = await aiResponse.json();
-      const replyText = aiData.choices?.[0]?.message?.content?.trim();
-      if (!replyText) {
-        results.push({ leadId: lead.id, status: "empty_response" });
-        continue;
-      }
+      const step = FOLLOW_UP_SEQUENCE[stepIndex];
+      const replyText = step.message;
 
       // Send SMS
       const twilioFrom = settings?.twilio_phone_number;
@@ -140,7 +109,6 @@ serve(async (req) => {
 
       const smsData = await smsResponse.json();
 
-      // Save message
       await supabase.from("messages").insert({
         lead_id: lead.id,
         direction: "outbound",
@@ -149,13 +117,18 @@ serve(async (req) => {
         status: smsResponse.ok ? "sent" : "failed",
       });
 
-      // Update lead
-      const hours = settings?.follow_up_interval_hours || 4;
-      await supabase.from("leads").update({
-        follow_up_count: lead.follow_up_count + 1,
-        next_follow_up_at: new Date(Date.now() + hours * 60 * 60 * 1000).toISOString(),
-      }).eq("id", lead.id);
+      // Schedule next follow-up or mark done
+      const nextCount = stepIndex + 1;
+      const updateData: Record<string, unknown> = { follow_up_count: nextCount };
 
+      if (step.delayToNextMs && nextCount < FOLLOW_UP_SEQUENCE.length) {
+        updateData.next_follow_up_at = new Date(Date.now() + step.delayToNextMs).toISOString();
+      } else {
+        // Final message sent — will be marked no_response on next cycle if no reply
+        updateData.next_follow_up_at = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      }
+
+      await supabase.from("leads").update(updateData).eq("id", lead.id);
       results.push({ leadId: lead.id, status: smsResponse.ok ? "sent" : "sms_failed" });
     }
 

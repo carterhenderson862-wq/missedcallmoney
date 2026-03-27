@@ -163,9 +163,9 @@ serve(async (req) => {
       });
 
       const updateData: Record<string, unknown> = { status: "contacted", follow_up_count: 0 };
-      if (settings?.follow_up_enabled) {
-        const hours = settings?.follow_up_interval_hours || 4;
-        updateData.next_follow_up_at = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+      if (settings?.follow_up_enabled !== false) {
+        // First follow-up fires in 5 minutes
+        updateData.next_follow_up_at = new Date(Date.now() + 5 * 60 * 1000).toISOString();
       }
       await supabase.from("leads").update(updateData).eq("id", lead.id);
 
