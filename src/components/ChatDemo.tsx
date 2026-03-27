@@ -107,15 +107,10 @@ const ChatDemo = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <p className="text-primary font-display font-semibold text-lg mb-3">
-            Example: $300+ job recovered from a missed call
-          </p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            Watch a <span className="text-gradient">$500 job</span> get booked
+            This turned a missed call into a{" "}
+            <span className="text-gradient">$300+ job</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Missed call → urgent AC repair → booked in under 60 seconds. No staff needed.
-          </p>
         </motion.div>
 
         <motion.div

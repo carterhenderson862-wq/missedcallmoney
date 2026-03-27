@@ -14,61 +14,63 @@ const HeroSection = () => {
 
       <div className="container relative z-10 py-24 md:py-32">
         <div className="max-w-3xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center justify-center gap-2 mb-6"
-          >
-            <span className="inline-flex items-center gap-2.5 rounded-full border border-border bg-card/80 px-4 py-1.5 text-sm font-medium text-muted-foreground">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              AI-powered for home service businesses
-            </span>
-          </motion.div>
-
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ duration: 0.6 }}
             className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-6"
           >
-            Every missed call is{" "}
-            <span className="text-gradient">money walking out</span> the door.
+            Turn missed calls into{" "}
+            <span className="text-gradient">booked jobs</span> automatically.
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-4 max-w-2xl mx-auto"
           >
-            CallRecover texts your missed callers within 60 seconds — booking
-            jobs while you're busy on the job.
+            Miss a call → We text them → You get the job
           </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="text-sm text-muted-foreground/70 mb-6"
+          >
+            Most businesses miss 30% of their calls. That's lost revenue.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="inline-flex items-center gap-3 md:gap-4 text-lg md:text-xl font-display font-bold mb-10 bg-card/60 border border-border rounded-xl px-6 py-3"
+          >
+            <span className="text-foreground">Today: 3 missed calls</span>
+            <span className="text-muted-foreground/40">→</span>
+            <span className="text-foreground">2 booked jobs</span>
+            <span className="text-muted-foreground/40">→</span>
+            <span className="text-gradient">$600 recovered</span>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
+            className="flex flex-col items-center gap-3"
           >
             <Button
               size="lg"
               className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-8 py-6 shadow-glow hover:opacity-90 transition-opacity"
             >
-              Book a Free Demo
+              Try this on your next missed call
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="font-display font-medium text-base px-8 py-6 border-border hover:bg-secondary"
-            >
-              See how it works ↓
-            </Button>
+            <p className="text-sm text-muted-foreground/60">
+              Takes 2 minutes. Works on your next missed call.
+            </p>
           </motion.div>
         </div>
       </div>
