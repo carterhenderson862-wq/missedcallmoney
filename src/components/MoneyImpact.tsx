@@ -1,8 +1,7 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { DollarSign } from "lucide-react";
 
-const CTASection = () => {
+const MoneyImpact = () => {
   return (
     <section className="py-24 md:py-32">
       <div className="container">
@@ -14,16 +13,18 @@ const CTASection = () => {
         >
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
           <div className="relative z-10">
+            <div className="mx-auto flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-8">
+              <DollarSign className="w-7 h-7" />
+            </div>
             <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-              Stop losing jobs from missed calls.
+              You missed 12 calls this week.
             </h2>
-            <p className="text-muted-foreground text-lg max-w-lg mx-auto mb-10">
-              Let it work on your next missed call.
+            <p className="font-display text-2xl md:text-3xl font-bold text-gradient mb-4">
+              That's potentially $3,600 in lost jobs.
             </p>
-            <Button size="lg" className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-10 py-6 shadow-glow hover:opacity-90 transition-opacity">
-              Try it on your calls
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-lg mx-auto">
+              We recover those automatically.
+            </p>
           </div>
         </motion.div>
       </div>
@@ -31,4 +32,4 @@ const CTASection = () => {
   );
 };
 
-export default CTASection;
+export default MoneyImpact;

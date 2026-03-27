@@ -4,21 +4,21 @@ import { PhoneMissed, MessageSquareText, CalendarCheck } from "lucide-react";
 const steps = [
   {
     icon: PhoneMissed,
-    title: "Missed call detected",
+    title: "Missed call",
     description:
-      "A customer calls while you're on a job. Within seconds, your AI agent reaches out via text.",
+      "A customer calls while you're on a job. Your AI agent picks it up instantly.",
   },
   {
     icon: MessageSquareText,
-    title: "Smart conversation",
+    title: "AI responds instantly",
     description:
-      "Not a generic template — your agent asks the right questions, qualifies the job, and handles objections like a real person.",
+      "Within seconds, your agent texts back, qualifies the job, and handles objections.",
   },
   {
     icon: CalendarCheck,
-    title: "Appointment booked",
+    title: "Job gets booked",
     description:
-      "The lead is qualified, the job details are captured, and the appointment lands directly in your calendar.",
+      "The lead is qualified, the appointment is locked in, and you get the job.",
   },
 ];
 
@@ -32,8 +32,11 @@ const HowItWorks = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
+          <p className="text-primary font-display font-semibold text-lg mb-3">
+            Miss a call → We text them → You get the job
+          </p>
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-            From missed call to <span className="text-gradient">booked job</span>
+            How it <span className="text-gradient">works</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             Three steps. Zero staff needed. Revenue recovered automatically.
