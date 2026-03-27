@@ -65,10 +65,10 @@ const ChatDemo = () => {
         </motion.div>
 
         <motion.div
+          ref={sectionRef}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          onViewportEnter={() => setIsInView(true)}
           className="max-w-lg mx-auto"
         >
           {/* Phone frame */}
