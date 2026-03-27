@@ -24,6 +24,7 @@ export type Database = {
           follow_up_interval_hours: number | null
           id: string
           max_follow_ups: number | null
+          service_area: string | null
           services: string[] | null
           twilio_phone_number: string | null
           updated_at: string
@@ -37,6 +38,7 @@ export type Database = {
           follow_up_interval_hours?: number | null
           id?: string
           max_follow_ups?: number | null
+          service_area?: string | null
           services?: string[] | null
           twilio_phone_number?: string | null
           updated_at?: string
@@ -50,6 +52,7 @@ export type Database = {
           follow_up_interval_hours?: number | null
           id?: string
           max_follow_ups?: number | null
+          service_area?: string | null
           services?: string[] | null
           twilio_phone_number?: string | null
           updated_at?: string
