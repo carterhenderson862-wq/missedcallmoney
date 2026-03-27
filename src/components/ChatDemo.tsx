@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { Bot, User, Send } from "lucide-react";
+import { Bot, User, Send, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Message {
   role: "bot" | "customer";
