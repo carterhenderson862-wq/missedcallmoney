@@ -1,16 +1,10 @@
-import { motion } from "framer-motion";
 import { DollarSign } from "lucide-react";
 
 const MoneyImpact = () => {
   return (
     <section className="py-[60px]">
       <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="relative rounded-3xl border border-primary/20 bg-gradient-glow p-12 md:p-20 text-center overflow-hidden"
-        >
+        <div className="relative rounded-3xl border border-primary/20 bg-gradient-glow p-12 md:p-20 text-center overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent" />
           <div className="relative z-10">
             <div className="mx-auto flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary mb-8">
@@ -26,7 +20,7 @@ const MoneyImpact = () => {
               We recover those automatically.
             </p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

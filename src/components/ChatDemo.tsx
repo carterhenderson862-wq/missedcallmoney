@@ -248,7 +248,7 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
