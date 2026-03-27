@@ -18,7 +18,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-2 mb-6"
+            className="flex items-center justify-center gap-2 mb-6"
           >
             <span className="inline-flex items-center gap-2.5 rounded-full border border-border bg-card/80 px-4 py-1.5 text-sm font-medium text-muted-foreground">
               <span className="relative flex h-2 w-2">
