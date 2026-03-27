@@ -4,6 +4,7 @@ import HeroSection from "@/components/HeroSection";
 import BuiltFor from "@/components/BuiltFor";
 import Differentiators from "@/components/Differentiators";
 import HowItWorks from "@/components/HowItWorks";
+import RealResult from "@/components/RealResult";
 import ChatDemo from "@/components/ChatDemo";
 import MoneyImpact from "@/components/MoneyImpact";
 import HowToStart from "@/components/HowToStart";
@@ -14,6 +15,15 @@ import CTAModal from "@/components/CTAModal";
 const Index = () => {
   const [ctaOpen, setCtaOpen] = useState(false);
 
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <HeroSection onCTAClick={() => setCtaOpen(true)} />
+      <BuiltFor />
+      <Differentiators />
+      <HowItWorks />
+      <RealResult />
+      <ChatDemo onCTAClick={() => setCtaOpen(true)} />
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
