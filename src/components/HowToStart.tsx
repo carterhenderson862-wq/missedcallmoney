@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Link2, PhoneMissed, CalendarCheck } from "lucide-react";
 
 const steps = [
@@ -11,25 +10,16 @@ const HowToStart = () => {
   return (
     <section className="py-[60px]">
       <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
+        <div className="text-center mb-12">
           <h2 className="font-display text-3xl md:text-5xl font-bold">
             How to <span className="text-gradient">get started</span>
           </h2>
-        </motion.div>
+        </div>
 
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12">
           {steps.map((step, i) => (
-            <motion.div
+            <div
               key={step.text}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
               className="flex items-center gap-4"
             >
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary flex-shrink-0">
@@ -41,7 +31,7 @@ const HowToStart = () => {
                 </span>
                 <p className="font-display text-lg font-semibold">{step.text}</p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

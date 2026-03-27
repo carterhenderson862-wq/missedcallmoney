@@ -100,23 +100,15 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
     <section className="py-[60px] bg-card">
       <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16">
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
             This turned a missed call into a{" "}
             <span className="text-gradient">$300+ job</span>
           </h2>
-        </motion.div>
+        </div>
 
-        <motion.div
+        <div
           ref={sectionRef}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
           className="max-w-lg mx-auto"
         >
           {/* Phone frame */}
@@ -256,7 +248,7 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

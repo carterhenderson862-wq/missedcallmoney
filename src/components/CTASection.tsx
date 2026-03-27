@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -6,10 +5,7 @@ const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
     <section id="cta" className="py-[60px]">
       <div className="container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+        <div
           className="relative rounded-3xl bg-card p-12 md:p-20 text-center overflow-hidden"
           style={{ border: "1px solid hsl(var(--primary) / 0.3)" }}
         >
@@ -33,7 +29,7 @@ const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
               Takes 2 minutes. Works with your current number. No setup headache.
             </p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
