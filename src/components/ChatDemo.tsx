@@ -210,7 +210,6 @@ const ChatDemo = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Input bar */}
