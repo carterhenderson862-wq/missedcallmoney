@@ -73,7 +73,7 @@ const ChatDemo = () => {
               <div>
                 <div className="font-display font-semibold text-sm">ProFlow Plumbing AI</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
                   Online · Avg reply &lt;30s
                 </div>
               </div>
