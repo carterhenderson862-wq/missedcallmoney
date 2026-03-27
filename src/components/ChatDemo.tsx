@@ -247,15 +247,14 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                 </Button>
               </motion.div>
             )}
-            <a href="#cta">
-              <Button
+            <Button
                 size="lg"
+                onClick={onCTAClick}
                 className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-8 py-6 shadow-glow hover:opacity-90 transition-opacity"
               >
                 Get This Working For Your Business
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </a>
             <p className="text-sm text-muted-foreground/60 mt-3">
               Takes 2 minutes. Works with your current number. No setup headache.
             </p>
