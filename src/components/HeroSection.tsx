@@ -43,7 +43,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl"
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto"
           >
             CallRecover texts your missed callers within 60 seconds — booking
             jobs while you're busy on the job.
