@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Bot, User, Send } from "lucide-react";
 
 interface Message {
@@ -22,22 +22,30 @@ const conversation: Message[] = [
 
 const ChatDemo = () => {
   const [visibleMessages, setVisibleMessages] = useState<number>(0);
-  const [isInView, setIsInView] = useState(false);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isInView || hasPlayed) return;
-    setHasPlayed(true);
-    setVisibleMessages(0);
+    const el = sectionRef.current;
+    if (!el) return;
 
-    const timeouts: NodeJS.Timeout[] = [];
-    conversation.forEach((msg, i) => {
-      const t = setTimeout(() => setVisibleMessages(i + 1), msg.delay + 600);
-      timeouts.push(t);
-    });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasPlayed) {
+          setHasPlayed(true);
+          setVisibleMessages(0);
 
-    return () => timeouts.forEach(clearTimeout);
-  }, [isInView, hasPlayed]);
+          conversation.forEach((_, i) => {
+            setTimeout(() => setVisibleMessages(i + 1), conversation[i].delay + 600);
+          });
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasPlayed]);
 
   return (
     <section className="py-24 md:py-32 bg-card">
