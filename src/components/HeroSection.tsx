@@ -33,8 +33,8 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-6"
           >
-            Most businesses miss 30% of their calls.{" "}
-            <span className="text-gradient">We turn those into revenue.</span>
+            You missed 12 calls this week.{" "}
+            <span className="text-gradient">That's $3,600 in lost jobs.</span>
           </motion.h1>
 
           <motion.p
@@ -43,7 +43,7 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl"
           >
-            Miss a call → We text them → You get the job.
+            We recover those automatically.
           </motion.p>
 
           <motion.div
