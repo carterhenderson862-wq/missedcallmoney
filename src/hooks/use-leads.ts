@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type Lead = {
@@ -30,6 +31,25 @@ export type Message = {
 };
 
 export function useLeads() {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("leads-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "leads" },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["leads"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   return useQuery({
     queryKey: ["leads"],
     queryFn: async () => {
@@ -40,11 +60,30 @@ export function useLeads() {
       if (error) throw error;
       return data as Lead[];
     },
-    refetchInterval: 5000,
   });
 }
 
 export function useMessages(leadId: string | null) {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!leadId) return;
+    const channel = supabase
+      .channel(`messages-${leadId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "messages", filter: `lead_id=eq.${leadId}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["messages", leadId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [leadId, queryClient]);
+
   return useQuery({
     queryKey: ["messages", leadId],
     queryFn: async () => {
@@ -58,7 +97,6 @@ export function useMessages(leadId: string | null) {
       return data as Message[];
     },
     enabled: !!leadId,
-    refetchInterval: 3000,
   });
 }
 

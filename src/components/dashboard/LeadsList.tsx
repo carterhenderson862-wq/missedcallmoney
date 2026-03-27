@@ -12,6 +12,7 @@ interface LeadsListProps {
 
 const statusColors: Record<string, string> = {
   new: "bg-blue-500/15 text-blue-400",
+  responded: "bg-cyan-500/15 text-cyan-400",
   contacted: "bg-primary/15 text-primary",
   qualifying: "bg-yellow-500/15 text-yellow-400",
   booking: "bg-emerald-500/15 text-emerald-400",

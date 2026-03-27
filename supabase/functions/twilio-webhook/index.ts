@@ -99,10 +99,15 @@ serve(async (req) => {
         body: body,
       });
 
-      // Update lead status + urgency flag
+      // Update lead: mark as "responded" when customer replies, + urgency flag
       const leadUpdate: Record<string, unknown> = {};
-      if (lead.status === "new") leadUpdate.status = "qualifying";
+      if (["new", "contacted"].includes(lead.status)) {
+        leadUpdate.status = "responded";
+      }
       if (isUrgent) leadUpdate.urgency = "high";
+      // Clear follow-up timer — customer replied
+      leadUpdate.next_follow_up_at = null;
+      leadUpdate.follow_up_count = 0;
       if (Object.keys(leadUpdate).length > 0) {
         await supabase.from("leads").update(leadUpdate).eq("id", lead.id);
       }
@@ -276,7 +281,7 @@ serve(async (req) => {
     });
 
     // Update lead status
-    const newStatus = isMissedCall ? "contacted" : determineStatus(replyText, lead.status);
+    const newStatus = isMissedCall ? "contacted" : determineStatus(replyText, body, lead.status);
     const updateData: Record<string, unknown> = { status: newStatus };
     
     if (isMissedCall) {
@@ -339,16 +344,31 @@ If they're hesitant: create urgency. "These things usually get worse if you wait
 If they stop responding: move on, don't beg.`;
 }
 
-function determineStatus(reply: string, currentStatus: string): string {
-  const lower = reply.toLowerCase();
-  if (lower.includes("booked") || lower.includes("confirmed") || lower.includes("see you")) {
+function determineStatus(aiReply: string, inboundMsg: string, currentStatus: string): string {
+  const reply = aiReply.toLowerCase();
+  const inbound = inboundMsg.toLowerCase();
+
+  // Customer confirmed booking
+  const confirmWords = ["yes", "yeah", "yep", "sure", "sounds good", "let's do it", "book it", "perfect", "that works", "confirm"];
+  const isBookingContext = currentStatus === "booking";
+  if (isBookingContext && confirmWords.some(w => inbound.includes(w))) {
     return "booked";
   }
-  if (lower.includes("time slot") || lower.includes("available") || lower.includes("schedule")) {
+
+  // AI is offering times / scheduling
+  if (reply.includes("schedule") || reply.includes("time slot") || reply.includes("available") || reply.includes("tomorrow") || reply.includes("today") || reply.includes("lock that in") || reply.includes("squeeze you in")) {
     return "booking";
   }
-  if (currentStatus === "new" || currentStatus === "contacted") {
+
+  // AI confirmed the booking
+  if (reply.includes("booked") || reply.includes("confirmed") || reply.includes("see you") || reply.includes("all set")) {
+    return "booked";
+  }
+
+  // AI is asking qualifying questions
+  if (reply.includes("?")) {
     return "qualifying";
   }
+
   return currentStatus;
 }
