@@ -89,10 +89,6 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="missed">Estimated missed calls per week <span className="text-muted-foreground">(optional)</span></Label>
-                <Input id="missed" type="number" value={form.missedCalls} onChange={(e) => setForm({ ...form, missedCalls: e.target.value })} />
-              </div>
               <Button type="submit" className="mt-2 bg-gradient-primary text-primary-foreground font-display font-semibold shadow-glow hover:opacity-90 transition-opacity">
                 Request Setup
               </Button>
