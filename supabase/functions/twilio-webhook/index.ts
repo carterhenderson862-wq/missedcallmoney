@@ -193,8 +193,20 @@ serve(async (req) => {
         });
       }
 
-      // If urgent, add directive to prioritize fast scheduling
-      if (isUrgent) {
+      // Detect if customer already gave enough info to book (problem + timing)
+      const TIMING_KEYWORDS = ["tomorrow", "today", "morning", "afternoon", "evening", "asap", "this week", "next week", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "9am", "10am", "11am", "noon", "1pm", "2pm", "3pm", "4pm", "free at", "i'm free", "im free", "available at", "can do"];
+      const PROBLEM_KEYWORDS = ["leak", "broken", "not working", "clogged", "no ac", "no heat", "no hot water", "dripping", "backed up", "running", "won't turn on", "wont turn on", "needs repair", "needs fixing", "replace", "install", "ac issue", "heater", "furnace", "toilet", "faucet", "pipe", "drain", "roof", "electrical", "outlet", "breaker"];
+      const lower = body.toLowerCase();
+      const hasTiming = TIMING_KEYWORDS.some(kw => lower.includes(kw));
+      const hasProblem = PROBLEM_KEYWORDS.some(kw => lower.includes(kw));
+      const readyToBook = hasTiming && hasProblem;
+
+      if (readyToBook) {
+        aiMessages.push({
+          role: "system",
+          content: "FAST-TRACK: The customer has stated both their problem AND when they're available. Do NOT ask more qualifying questions. Immediately offer a specific time slot and confirm. Example: \"Got it—we can do tomorrow morning. Want me to lock in 9am?\"",
+        });
+      } else if (isUrgent) {
         aiMessages.push({
           role: "system",
           content: "URGENT JOB DETECTED. Treat this as high priority. Respond with urgency, acknowledge the problem, and push to schedule ASAP. Example: \"Got it—that sounds urgent. Want me to get you scheduled ASAP?\" Keep it to 1-2 sentences.",
