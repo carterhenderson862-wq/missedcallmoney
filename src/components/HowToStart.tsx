@@ -9,7 +9,7 @@ const steps = [
 
 const HowToStart = () => {
   return (
-    <section className="py-24 md:py-32">
+    <section className="py-[60px]">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
