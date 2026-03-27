@@ -46,13 +46,16 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-3 md:gap-4 text-lg md:text-xl font-display font-bold mb-10 bg-card/60 border border-border rounded-xl px-6 py-3"
+            className="mb-10"
           >
-            <span className="text-foreground">Today: 3 missed calls</span>
-            <span className="text-muted-foreground/40">→</span>
-            <span className="text-foreground">2 booked jobs</span>
-            <span className="text-muted-foreground/40">→</span>
-            <span className="text-gradient">$600 recovered</span>
+            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">Today's results</p>
+            <div className="inline-block bg-card/40 border border-border/60 rounded-lg px-5 py-3 text-left font-mono">
+              <span className="text-muted-foreground text-sm">3 missed calls</span>
+              <span className="text-muted-foreground/30 mx-2">→</span>
+              <span className="text-foreground font-bold text-sm">2 booked jobs</span>
+              <span className="text-muted-foreground/30 mx-2">→</span>
+              <span className="text-emerald-400 font-bold text-base">$600 recovered</span>
+            </div>
           </motion.div>
 
           <motion.div
