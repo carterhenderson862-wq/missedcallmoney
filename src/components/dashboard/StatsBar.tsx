@@ -1,28 +1,27 @@
-import { PhoneMissed, CalendarCheck, MessageSquare, DollarSign, TrendingUp } from "lucide-react";
+import { PhoneMissed, CalendarCheck, MessageSquare, DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
+import { isToday } from "date-fns";
 import type { Lead } from "@/hooks/use-leads";
 
 interface StatsBarProps {
   leads: Lead[];
 }
 
-const AVG_JOB_VALUE = 350; // average revenue per booked job
+const AVG_JOB_VALUE = 350;
 
 const StatsBar = ({ leads }: StatsBarProps) => {
   const missedCalls = leads.filter((l) => l.source === "missed_call").length;
+  const missedToday = leads.filter((l) => l.source === "missed_call" && isToday(new Date(l.created_at))).length;
   const engaged = leads.filter((l) => ["responded", "qualifying", "booking", "booked"].includes(l.status)).length;
   const booked = leads.filter((l) => l.status === "booked").length;
-  const estimatedRevenue = booked * AVG_JOB_VALUE;
+  const lost = leads.filter((l) => ["lost", "no_response"].includes(l.status)).length;
+  const recoveredRevenue = booked * AVG_JOB_VALUE;
+  const lostRevenue = lost * AVG_JOB_VALUE;
 
   const stats = [
     { label: "Missed Calls", value: missedCalls, icon: PhoneMissed, color: "text-primary" },
     { label: "Leads Engaged", value: engaged, icon: MessageSquare, color: "text-cyan-400" },
-    { label: "Leads Booked", value: booked, icon: CalendarCheck, color: "text-emerald-400" },
-    {
-      label: "Est. Revenue",
-      value: `$${estimatedRevenue.toLocaleString()}`,
-      icon: DollarSign,
-      color: "text-emerald-400",
-    },
+    { label: "Recovered", value: `$${recoveredRevenue.toLocaleString()}`, icon: CalendarCheck, color: "text-emerald-400" },
+    { label: "Lost Revenue", value: `$${lostRevenue.toLocaleString()}`, icon: AlertTriangle, color: "text-destructive" },
   ];
 
   return (
@@ -39,16 +38,31 @@ const StatsBar = ({ leads }: StatsBarProps) => {
         ))}
       </div>
 
+      {/* Missed today alert */}
+      {missedToday > 0 && (
+        <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-5 py-4 flex items-center gap-3">
+          <PhoneMissed className="w-5 h-5 text-destructive shrink-0" />
+          <p className="text-sm text-foreground">
+            You missed <span className="font-bold text-destructive">{missedToday} call{missedToday !== 1 ? "s" : ""}</span> today
+            {" "}— estimated lost revenue: <span className="font-bold text-destructive">${(missedToday * AVG_JOB_VALUE).toLocaleString()}</span> if not recovered.
+          </p>
+        </div>
+      )}
+
+      {/* Recovery insight */}
       {(booked > 0 || engaged > 0) && (
         <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-5 py-4 flex items-center gap-3">
           <TrendingUp className="w-5 h-5 text-emerald-400 shrink-0" />
           <p className="text-sm text-foreground">
             {booked > 0 ? (
               <>
-                You recovered <span className="font-bold text-emerald-400">{booked} lead{booked !== 1 ? "s" : ""}</span> worth approximately{" "}
-                <span className="font-bold text-emerald-400">${estimatedRevenue.toLocaleString()}</span>
+                Recovered <span className="font-bold text-emerald-400">${recoveredRevenue.toLocaleString()}</span> from{" "}
+                <span className="font-bold text-emerald-400">{booked} booked job{booked !== 1 ? "s" : ""}</span>
                 {engaged > booked && (
-                  <> — plus <span className="font-semibold text-cyan-400">{engaged - booked} more</span> still in the pipeline</>
+                  <> — plus <span className="font-semibold text-cyan-400">{engaged - booked} more</span> in the pipeline</>
+                )}
+                {lost > 0 && (
+                  <> · <span className="text-destructive font-semibold">${lostRevenue.toLocaleString()}</span> still unrecovered</>
                 )}
               </>
             ) : (
