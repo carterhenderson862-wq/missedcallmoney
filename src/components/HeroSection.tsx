@@ -43,7 +43,7 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl"
           >
-            We fix that instantly.
+            Miss a call → We text them → We book the job.
           </motion.p>
 
           <motion.div
