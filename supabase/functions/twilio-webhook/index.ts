@@ -122,12 +122,57 @@ serve(async (req) => {
     ];
 
     if (isMissedCall) {
-      aiMessages.push({
-        role: "user",
-        content: "Customer just called and we missed it. Text them back like a busy dispatcher—short, direct, ask what's going on. Example: 'Hey—sorry we missed you. What's going on, is this something urgent?'",
+      // Always send this exact first message for missed calls — skip AI
+      const replyText = "Hey—sorry we missed your call. What's going on, is this something urgent?";
+
+      // Send SMS via Twilio gateway
+      const twilioFrom = settings?.twilio_phone_number;
+      if (!twilioFrom) {
+        await supabase.from("messages").insert({
+          lead_id: lead.id,
+          direction: "outbound",
+          body: replyText,
+          status: "pending_no_phone",
+        });
+        return new Response(
+          JSON.stringify({ message: "No Twilio phone configured", reply: replyText }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const smsResponse = await fetch(`${GATEWAY_URL}/Messages.json`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "X-Connection-Api-Key": TWILIO_API_KEY,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ To: fromNumber, From: twilioFrom, Body: replyText }),
       });
+      const smsData = await smsResponse.json();
+      if (!smsResponse.ok) {
+        throw new Error(`Twilio SMS error [${smsResponse.status}]: ${JSON.stringify(smsData)}`);
+      }
+
+      await supabase.from("messages").insert({
+        lead_id: lead.id,
+        direction: "outbound",
+        body: replyText,
+        twilio_sid: smsData.sid,
+        status: "sent",
+      });
+
+      const updateData: Record<string, unknown> = { status: "contacted", follow_up_count: 0 };
+      if (settings?.follow_up_enabled) {
+        const hours = settings?.follow_up_interval_hours || 4;
+        updateData.next_follow_up_at = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+      }
+      await supabase.from("leads").update(updateData).eq("id", lead.id);
+
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
     } else {
-      // Include conversation history
+      // Include conversation history for AI response
       for (const msg of messageHistory || []) {
         aiMessages.push({
           role: msg.direction === "inbound" ? "user" : "assistant",
