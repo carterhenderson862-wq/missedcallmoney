@@ -23,7 +23,7 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <section className="py-24 md:py-32 bg-card/30">
+    <section className="py-[60px] bg-card/30">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -49,6 +49,7 @@ const Testimonials = () => {
               transition={{ delay: i * 0.12 }}
               className="rounded-2xl border border-border bg-card p-8 flex flex-col"
             >
+              <div className="text-primary text-lg mb-3 tracking-wide">★★★★★</div>
               <p className="text-foreground leading-relaxed flex-1 mb-6">
                 "{t.quote}"
               </p>

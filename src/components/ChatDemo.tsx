@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { Bot, User, Send } from "lucide-react";
+import { Bot, User, Send, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Message {
   role: "bot" | "customer";
@@ -46,7 +47,7 @@ const ChatDemo = () => {
   }, [hasPlayed]);
 
   return (
-    <section className="py-24 md:py-32 bg-card">
+    <section className="py-[60px] bg-card">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -154,6 +155,19 @@ const ChatDemo = () => {
           <p className="text-center text-sm text-muted-foreground mt-6 font-medium">
             This happens automatically every time you miss a call.
           </p>
+
+          {/* CTA Button */}
+          <div className="text-center mt-8">
+            <a href="#cta">
+              <Button
+                size="lg"
+                className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-8 py-6 shadow-glow hover:opacity-90 transition-opacity"
+              >
+                Get This Working For Your Business
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </a>
+          </div>
         </motion.div>
       </div>
     </section>

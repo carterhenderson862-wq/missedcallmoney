@@ -5,7 +5,7 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
         <img src={heroBg} alt="" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-background/85" />
@@ -13,12 +13,12 @@ const HeroSection = () => {
       </div>
 
       <div className="container relative z-10 py-24 md:py-32">
-        <div className="max-w-3xl">
+        <div className="max-w-3xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-2 mb-6"
+            className="flex items-center justify-center gap-2 mb-6"
           >
             <span className="inline-flex items-center gap-2.5 rounded-full border border-border bg-card/80 px-4 py-1.5 text-sm font-medium text-muted-foreground">
               <span className="relative flex h-2 w-2">
@@ -43,7 +43,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl"
+            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto"
           >
             CallRecover texts your missed callers within 60 seconds — booking
             jobs while you're busy on the job.
@@ -53,7 +53,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4"
+            className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Button
               size="lg"
@@ -67,7 +67,7 @@ const HeroSection = () => {
               size="lg"
               className="font-display font-medium text-base px-8 py-6 border-border hover:bg-secondary"
             >
-              See how it works
+              See how it works ↓
             </Button>
           </motion.div>
         </div>
