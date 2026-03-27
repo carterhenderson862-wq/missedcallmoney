@@ -203,10 +203,13 @@ const ChatDemo = () => {
                     transition={{ duration: 0.4, ease: "easeOut" }}
                     className="flex justify-center pt-2"
                   >
-                    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-5 py-2 text-sm font-display font-semibold text-emerald-400">
-                      <CheckCircle2 className="w-4 h-4" />
-                      Job Booked ✓
-                    </span>
+                    <div className="flex flex-col items-center gap-1.5">
+                      <span className="inline-flex items-center gap-2 rounded-xl bg-emerald-500/20 border-2 border-emerald-500/40 px-6 py-3 text-base font-display font-bold text-emerald-400 shadow-lg shadow-emerald-500/10">
+                        <CheckCircle2 className="w-5 h-5" />
+                        Appointment Confirmed
+                      </span>
+                      <span className="text-xs text-emerald-400/70 font-medium">Today at 3:00 PM · HVAC Repair</span>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
