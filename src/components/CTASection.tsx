@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const CTASection = () => {
+const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
     <section id="cta" className="py-[60px]">
       <div className="container">
