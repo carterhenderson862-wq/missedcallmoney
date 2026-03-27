@@ -10,13 +10,12 @@ interface Message {
 }
 
 const conversation: Message[] = [
-  { role: "bot", text: "Hey! This is Austin Plumbing 👋 Sorry we missed your call — what's going on?", time: "2:14 PM" },
   { role: "customer", text: "My AC isn't working", time: "2:14 PM" },
-  { role: "bot", text: "Oh no, is it totally out or just not blowing cold?", time: "2:15 PM" },
+  { role: "bot", text: "Got it—is it completely out or just not cooling well?", time: "2:15 PM" },
   { role: "customer", text: "Completely out", time: "2:15 PM" },
-  { role: "bot", text: "Ugh that's rough, especially in this heat 😅 We actually have a slot open today — would this afternoon work for you?", time: "2:16 PM" },
+  { role: "bot", text: "Okay—that's urgent. We can get someone out today. Are you available this afternoon?", time: "2:16 PM" },
   { role: "customer", text: "Yes", time: "2:16 PM" },
-  { role: "bot", text: "Perfect! Locking you in for 3pm. You'll get a confirmation text shortly 👍", time: "2:17 PM" },
+  { role: "bot", text: "Perfect—you're booked for 3pm today.", time: "2:17 PM" },
 ];
 
 const ChatDemo = () => {
