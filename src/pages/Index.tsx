@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import BuiltFor from "@/components/BuiltFor";
@@ -8,20 +9,24 @@ import MoneyImpact from "@/components/MoneyImpact";
 import HowToStart from "@/components/HowToStart";
 import CTASection from "@/components/CTASection";
 import TrustFooter from "@/components/TrustFooter";
+import CTAModal from "@/components/CTAModal";
 
 const Index = () => {
+  const [ctaOpen, setCtaOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <HeroSection />
+      <HeroSection onCTAClick={() => setCtaOpen(true)} />
       <BuiltFor />
       <Differentiators />
       <HowItWorks />
-      <ChatDemo />
+      <ChatDemo onCTAClick={() => setCtaOpen(true)} />
       <MoneyImpact />
       <HowToStart />
-      <CTASection />
+      <CTASection onCTAClick={() => setCtaOpen(true)} />
       <TrustFooter />
+      <CTAModal open={ctaOpen} onOpenChange={setCtaOpen} />
     </div>
   );
 };
