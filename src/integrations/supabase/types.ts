@@ -158,6 +158,7 @@ export type Database = {
     Enums: {
       lead_status:
         | "new"
+        | "responded"
         | "contacted"
         | "qualifying"
         | "booking"
@@ -293,6 +294,7 @@ export const Constants = {
     Enums: {
       lead_status: [
         "new",
+        "responded",
         "contacted",
         "qualifying",
         "booking",
