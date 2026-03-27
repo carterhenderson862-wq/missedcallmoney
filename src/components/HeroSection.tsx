@@ -33,8 +33,8 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-display text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight mb-6"
           >
-            Stop losing jobs to{" "}
-            <span className="text-gradient">missed calls.</span>
+            Turn missed calls into{" "}
+            <span className="text-gradient">booked jobs</span> automatically.
           </motion.h1>
 
           <motion.p
