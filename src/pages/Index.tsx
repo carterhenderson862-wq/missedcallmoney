@@ -24,14 +24,6 @@ const Index = () => {
       <HowItWorks />
       <RealResult />
       <ChatDemo onCTAClick={() => setCtaOpen(true)} />
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <HeroSection onCTAClick={() => setCtaOpen(true)} />
-      <BuiltFor />
-      <Differentiators />
-      <HowItWorks />
-      <ChatDemo onCTAClick={() => setCtaOpen(true)} />
       <MoneyImpact />
       <HowToStart />
       <CTASection onCTAClick={() => setCtaOpen(true)} />
