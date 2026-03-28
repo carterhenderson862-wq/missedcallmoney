@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
+import SocialProofBanner from "./SocialProofBanner";
+import TrustBadges from "./TrustBadges";
 
 const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
