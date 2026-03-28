@@ -10,6 +10,7 @@ import ChatDemo from "@/components/ChatDemo";
 import TestimonialCards from "@/components/TestimonialCards";
 import MoneyImpact from "@/components/MoneyImpact";
 import HowToStart from "@/components/HowToStart";
+import AsSeenWorking from "@/components/AsSeenWorking";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import TrustFooter from "@/components/TrustFooter";
@@ -32,6 +33,7 @@ const Index = () => {
       <TestimonialCards />
       <MoneyImpact />
       <HowToStart />
+      <AsSeenWorking />
       <FAQSection />
       <CTASection onCTAClick={() => setCtaOpen(true)} />
       <TrustFooter />
