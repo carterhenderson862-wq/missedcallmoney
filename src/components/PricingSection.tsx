@@ -14,10 +14,18 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
           </p>
 
           <div className="rounded-2xl border border-border bg-card p-8 md:p-10 text-center">
-            <div className="mb-6">
-              <span className="font-display text-5xl font-bold text-foreground">$97</span>
+            <div className="mb-2">
+              <span className="font-display text-2xl md:text-3xl font-bold text-primary">Free trial</span>
+              <span className="text-muted-foreground text-base ml-1">(7–14 days)</span>
+            </div>
+            <div className="mb-3">
+              <span className="text-muted-foreground text-sm">Then </span>
+              <span className="font-display text-4xl font-bold text-foreground">$249</span>
               <span className="text-muted-foreground text-lg">/month</span>
             </div>
+            <p className="text-sm text-muted-foreground/70 mb-8">
+              Usually pays for itself with just one job.
+            </p>
 
             <ul className="space-y-3 text-sm text-foreground mb-8 text-left max-w-xs mx-auto">
               {[
@@ -40,7 +48,7 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
               onClick={onCTAClick}
               className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-10 py-6 shadow-glow hover:opacity-90 transition-opacity w-full"
             >
-              Try it on your next missed call
+              Start free trial
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
