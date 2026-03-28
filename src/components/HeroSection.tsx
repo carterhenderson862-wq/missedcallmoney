@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroBg from "@/assets/hero-bg.jpg";
+import SocialProofBanner from "./SocialProofBanner";
+import TrustBadges from "./TrustBadges";
 
 const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
@@ -75,6 +77,19 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             <p className="text-sm text-muted-foreground/60">
               Takes 2 minutes. Works with your current number. No setup headache.
             </p>
+            <TrustBadges />
+          </motion.div>
+
+          <SocialProofBanner />
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="flex items-center justify-center gap-1.5 mt-6 text-xs text-muted-foreground/60"
+          >
+            <Zap className="w-3.5 h-3.5 text-primary" />
+            <span>Avg. response time: 28 seconds</span>
           </motion.div>
         </div>
       </div>
