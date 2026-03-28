@@ -33,6 +33,7 @@ const Index = () => {
       <TestimonialCards />
       <MoneyImpact />
       <HowToStart />
+      <AsSeenWorking />
       <FAQSection />
       <CTASection onCTAClick={() => setCtaOpen(true)} />
       <TrustFooter />
