@@ -7,6 +7,16 @@ interface ConversationViewProps {
   messages: Message[];
 }
 
+const DetailRow = ({ icon, label, value, highlight }: { icon: React.ReactNode; label: string; value: string; highlight?: boolean }) => (
+  <div className="flex items-start gap-1.5 min-w-0">
+    <span className="text-muted-foreground mt-0.5">{icon}</span>
+    <div className="min-w-0">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70">{label}</div>
+      <div className={`truncate ${highlight ? "text-primary font-medium" : "text-foreground"}`}>{value}</div>
+    </div>
+  </div>
+);
+
 const ConversationView = ({ lead, messages }: ConversationViewProps) => {
   if (!lead) {
     return (
