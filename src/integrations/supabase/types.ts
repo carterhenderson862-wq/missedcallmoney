@@ -24,6 +24,7 @@ export type Database = {
           follow_up_interval_hours: number | null
           id: string
           max_follow_ups: number | null
+          owner_user_id: string
           service_area: string | null
           services: string[] | null
           twilio_phone_number: string | null
@@ -38,6 +39,7 @@ export type Database = {
           follow_up_interval_hours?: number | null
           id?: string
           max_follow_ups?: number | null
+          owner_user_id: string
           service_area?: string | null
           services?: string[] | null
           twilio_phone_number?: string | null
@@ -52,6 +54,7 @@ export type Database = {
           follow_up_interval_hours?: number | null
           id?: string
           max_follow_ups?: number | null
+          owner_user_id?: string
           service_area?: string | null
           services?: string[] | null
           twilio_phone_number?: string | null
@@ -70,6 +73,7 @@ export type Database = {
           job_details: Json | null
           location: string | null
           next_follow_up_at: string | null
+          owner_user_id: string
           phone_number: string
           service_type: string | null
           source: string | null
@@ -87,6 +91,7 @@ export type Database = {
           job_details?: Json | null
           location?: string | null
           next_follow_up_at?: string | null
+          owner_user_id: string
           phone_number: string
           service_type?: string | null
           source?: string | null
@@ -104,6 +109,7 @@ export type Database = {
           job_details?: Json | null
           location?: string | null
           next_follow_up_at?: string | null
+          owner_user_id?: string
           phone_number?: string
           service_type?: string | null
           source?: string | null
@@ -120,6 +126,7 @@ export type Database = {
           direction: string
           id: string
           lead_id: string
+          owner_user_id: string
           status: string | null
           twilio_sid: string | null
         }
@@ -129,6 +136,7 @@ export type Database = {
           direction: string
           id?: string
           lead_id: string
+          owner_user_id: string
           status?: string | null
           twilio_sid?: string | null
         }
@@ -138,6 +146,7 @@ export type Database = {
           direction?: string
           id?: string
           lead_id?: string
+          owner_user_id?: string
           status?: string | null
           twilio_sid?: string | null
         }
@@ -156,7 +165,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_user_business_id: { Args: never; Returns: string }
     }
     Enums: {
       lead_status:
