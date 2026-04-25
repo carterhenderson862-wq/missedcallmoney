@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
-    <section className="py-[60px]">
+    <section id="pricing" className="scroll-mt-20 py-[60px]">
       <div className="container">
         <div className="max-w-lg mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
@@ -16,18 +16,18 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
           <div className="rounded-2xl border border-border bg-card p-8 md:p-10 text-center">
             <div className="mb-2">
               <span className="font-display text-2xl md:text-3xl font-bold text-primary">Free trial</span>
-              <span className="text-muted-foreground text-base ml-1">(7–14 days)</span>
+              <span className="text-muted-foreground text-base ml-1">(7 days)</span>
             </div>
             <div className="mb-3">
               <span className="text-muted-foreground text-sm">Then </span>
-              <span className="font-display text-4xl font-bold text-foreground">$249</span>
+              <span className="font-display text-4xl font-bold text-foreground">$97</span>
               <span className="text-muted-foreground text-lg">/month</span>
             </div>
             <p className="text-sm text-muted-foreground/70 mb-2">
               Most missed calls are worth <span className="font-bold text-foreground">$100–$1,000+</span> in jobs.
             </p>
             <p className="text-sm text-muted-foreground/70 mb-2">
-              If this recovers just <span className="font-bold text-foreground">1–2 jobs</span>, it pays for itself.
+              If this recovers just <span className="font-bold text-foreground">one job</span>, it pays for itself <span className="font-bold text-foreground">3x over</span>.
             </p>
             <p className="text-xs text-muted-foreground/50 mb-8">
               No risk. Cancel anytime.

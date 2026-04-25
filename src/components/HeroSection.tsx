@@ -50,7 +50,7 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-10"
           >
-            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">Today's results</p>
+            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">Example results</p>
             <div className="inline-block bg-card/40 border border-border/60 rounded-lg px-5 py-3 text-left font-mono">
               <span className="text-muted-foreground text-sm">3 missed calls</span>
               <span className="text-muted-foreground/30 mx-2">→</span>

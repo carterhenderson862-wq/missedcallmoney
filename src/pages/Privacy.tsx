@@ -71,7 +71,11 @@ const Privacy = () => {
           <section>
             <h2 className="font-display text-2xl font-semibold mb-3">Contact</h2>
             <p className="text-muted-foreground">
-              Questions about privacy? Reach out and we'll respond promptly.
+              Questions about privacy? Email us at{" "}
+              <a href="mailto:support@callrecover.com" className="text-primary hover:underline font-medium">
+                support@callrecover.com
+              </a>{" "}
+              and we'll respond promptly.
             </p>
           </section>
         </div>
