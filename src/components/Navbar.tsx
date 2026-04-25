@@ -1,6 +1,10 @@
 import { Phone } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/use-auth";
 
 const Navbar = () => {
+  const { session, loading } = useAuth();
+
   const handlePricingClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const el = document.getElementById("pricing");
@@ -16,13 +20,23 @@ const Navbar = () => {
           <Phone className="w-5 h-5 text-primary" />
           <span>CallRecover</span>
         </div>
-        <a
-          href="#pricing"
-          onClick={handlePricingClick}
-          className="text-sm font-display font-medium text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Pricing
-        </a>
+        <div className="flex items-center gap-6">
+          <a
+            href="#pricing"
+            onClick={handlePricingClick}
+            className="text-sm font-display font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Pricing
+          </a>
+          {!loading && (
+            <Link
+              to={session ? "/dashboard" : "/auth"}
+              className="text-sm font-display font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {session ? "Dashboard" : "Sign in"}
+            </Link>
+          )}
+        </div>
       </div>
     </nav>
   );
