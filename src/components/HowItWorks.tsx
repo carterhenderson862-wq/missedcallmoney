@@ -43,7 +43,7 @@ const HowItWorks = () => {
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-6">
                 <step.icon className="w-6 h-6" />
               </div>
-              <span className="absolute top-8 right-8 font-display text-5xl font-bold text-muted-foreground/10">
+              <span aria-hidden="true" className="absolute top-8 right-8 font-display text-5xl font-bold text-muted-foreground/10">
                 {String(i + 1).padStart(2, "0")}
               </span>
               <h3 className="font-display text-xl font-semibold mb-3">{step.title}</h3>
