@@ -7,6 +7,16 @@ interface ConversationViewProps {
   messages: Message[];
 }
 
+const DetailRow = ({ icon, label, value, highlight }: { icon: React.ReactNode; label: string; value: string; highlight?: boolean }) => (
+  <div className="flex items-start gap-1.5 min-w-0">
+    <span className="text-muted-foreground mt-0.5">{icon}</span>
+    <div className="min-w-0">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70">{label}</div>
+      <div className={`truncate ${highlight ? "text-primary font-medium" : "text-foreground"}`}>{value}</div>
+    </div>
+  </div>
+);
+
 const ConversationView = ({ lead, messages }: ConversationViewProps) => {
   if (!lead) {
     return (
@@ -19,37 +29,34 @@ const ConversationView = ({ lead, messages }: ConversationViewProps) => {
     );
   }
 
+  const issue = (lead.job_details as Record<string, unknown> | null)?.issue as string | undefined;
+  const urgencyLabel = lead.urgency === "high" ? "Urgent" : lead.urgency ? "Scheduled" : null;
+
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden flex flex-col">
       {/* Lead info header */}
-      <div className="px-5 py-4 border-b border-border">
-        <div className="flex items-center justify-between mb-2">
+      <div className="px-5 py-4 border-b border-border space-y-3">
+        <div className="flex items-center justify-between">
           <h2 className="font-display font-semibold">
             {lead.customer_name || lead.phone_number}
           </h2>
-          <span className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
-          </span>
+          <div className="flex items-center gap-2">
+            {urgencyLabel && (
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider ${lead.urgency === "high" ? "bg-destructive/15 text-destructive" : "bg-muted text-muted-foreground"}`}>
+                {urgencyLabel}
+              </span>
+            )}
+            <span className="text-xs text-muted-foreground">
+              {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
+            </span>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1">
-            <Phone className="w-3 h-3" /> {lead.phone_number}
-          </span>
-          {lead.service_type && (
-            <span className="flex items-center gap-1">
-              <Wrench className="w-3 h-3" /> {lead.service_type}
-            </span>
-          )}
-          {lead.location && (
-            <span className="flex items-center gap-1">
-              <MapPin className="w-3 h-3" /> {lead.location}
-            </span>
-          )}
-          {lead.booked_slot && (
-            <span className="flex items-center gap-1 text-primary">
-              <Clock className="w-3 h-3" /> Booked: {lead.booked_slot}
-            </span>
-          )}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+          <DetailRow icon={<Phone className="w-3 h-3" />} label="Phone" value={lead.phone_number} />
+          {lead.service_type && <DetailRow icon={<Wrench className="w-3 h-3" />} label="Service" value={lead.service_type} />}
+          {issue && <DetailRow icon={<Wrench className="w-3 h-3" />} label="Issue" value={issue} />}
+          {lead.location && <DetailRow icon={<MapPin className="w-3 h-3" />} label="Location" value={lead.location} />}
+          {lead.booked_slot && <DetailRow icon={<Clock className="w-3 h-3" />} label="Preferred time" value={lead.booked_slot} highlight />}
         </div>
       </div>
 

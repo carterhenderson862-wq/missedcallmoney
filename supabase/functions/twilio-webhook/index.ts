@@ -212,7 +212,7 @@ serve(async (req) => {
 
     if (isMissedCall) {
       const bizName = settings?.business_name || "us";
-      const replyText = `Hey—this is ${bizName}. Sorry we missed your call. Is this urgent or something we can schedule for later?`;
+      const replyText = `Hey—sorry we missed your call. What's going on, is this something urgent?`;
 
       if (!twilioFrom) {
         await supabase.from("messages").insert({
@@ -273,27 +273,35 @@ serve(async (req) => {
       });
     }
 
-    const TIMING_KEYWORDS = ["tomorrow", "today", "morning", "afternoon", "evening", "asap", "this week", "next week", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "9am", "10am", "11am", "noon", "1pm", "2pm", "3pm", "4pm", "free at", "i'm free", "im free", "available at", "can do"];
-    const PROBLEM_KEYWORDS = ["leak", "broken", "not working", "clogged", "no ac", "no heat", "no hot water", "dripping", "backed up", "running", "won't turn on", "wont turn on", "needs repair", "needs fixing", "replace", "install", "ac issue", "heater", "furnace", "toilet", "faucet", "pipe", "drain", "roof", "electrical", "outlet", "breaker"];
-    const lower = body.toLowerCase();
-    const hasTiming = TIMING_KEYWORDS.some(kw => lower.includes(kw));
-    const hasProblem = PROBLEM_KEYWORDS.some(kw => lower.includes(kw));
-    const readyToBook = hasTiming && hasProblem;
+    // (legacy keyword fast-track removed — dispatcher checklist below drives flow)
 
-    if (readyToBook) {
+    // Build dispatcher checklist of what's still missing on this lead
+    const missing: string[] = [];
+    if (!lead.service_type) missing.push("service_type (plumbing/HVAC/roofing/electrical/other)");
+    if (!lead.urgency) missing.push("urgency (urgent vs scheduled)");
+    if (!lead.job_details || Object.keys((lead.job_details as Record<string, unknown>) || {}).length === 0) missing.push("issue (what exactly is wrong)");
+    if (!lead.location) missing.push("location (area or address)");
+    if (!lead.customer_name) missing.push("customer_name");
+    if (!lead.booked_slot) missing.push("preferred_time");
+
+    const nextNeeded = missing[0] || null;
+
+    if (isUrgent && !lead.urgency) {
       aiMessages.push({
         role: "system",
-        content: "FAST-TRACK: The customer has stated both their problem AND when they're available. Do NOT ask more qualifying questions. Immediately offer a specific time slot and confirm.",
+        content: "URGENT JOB DETECTED. Acknowledge urgency in 1 short sentence, then ask the next missing detail. Example: 'Got it — we'll treat this as urgent. Are you available now or later today?' 1-2 sentences max.",
       });
-    } else if (isUrgent) {
+    }
+
+    if (nextNeeded) {
       aiMessages.push({
         role: "system",
-        content: "URGENT JOB DETECTED. Acknowledge urgency in 1 short sentence, then immediately offer same-day/ASAP availability. Example tone: 'Got it—we'll treat this as urgent. Are you free now or later today?' Keep it to 1-2 sentences and always end with a scheduling question.",
+        content: `DISPATCHER CHECKLIST: Ask ONE question to capture: ${nextNeeded}. Do NOT ask anything already collected. Keep it to 1 sentence, natural and contractor-like. Examples by field:\n- service_type: "Is this for plumbing, HVAC, roofing, electrical, or something else?"\n- issue: "What's the issue exactly?"\n- location: "What area or address is this for?"\n- customer_name: "What's your name so we can put it with the request?"\n- preferred_time: "Want the earliest available, or is there a time that works best?"`,
       });
     } else {
       aiMessages.push({
         role: "system",
-        content: "NON-URGENT: Customer is flexible on timing. Move toward booking by offering next available days. Example tone: 'Perfect—what day works best for you?' Keep it warm, short, and always end with a scheduling question.",
+        content: "ALL DETAILS COLLECTED. Confirm booking intent in 1 sentence: 'Perfect — I'll mark this as ready to book and have the team confirm shortly.' Do NOT ask more questions.",
       });
     }
 
@@ -372,8 +380,79 @@ serve(async (req) => {
       status: "sent",
     });
 
-    const newStatus = determineStatus(replyText, body, lead.status);
-    await supabase.from("leads").update({ status: newStatus }).eq("id", lead.id);
+    // Extract structured details from the latest customer message via tool calling
+    try {
+      const extractResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { role: "system", content: "Extract any details the customer provided in this SMS. Only set fields explicitly mentioned. Leave others null." },
+            { role: "user", content: `Customer SMS: "${body}"\n\nKnown so far: ${JSON.stringify({ service_type: lead.service_type, customer_name: lead.customer_name, location: lead.location, urgency: lead.urgency, booked_slot: lead.booked_slot, issue: (lead.job_details as Record<string, unknown>)?.issue || null })}` },
+          ],
+          tools: [{
+            type: "function",
+            function: {
+              name: "save_lead_details",
+              description: "Save details extracted from the customer SMS.",
+              parameters: {
+                type: "object",
+                properties: {
+                  service_type: { type: ["string", "null"], description: "plumbing, HVAC, roofing, electrical, or other" },
+                  customer_name: { type: ["string", "null"] },
+                  location: { type: ["string", "null"], description: "Area, neighborhood, or address" },
+                  urgency: { type: ["string", "null"], enum: ["high", "normal", null], description: "high if urgent/emergency/ASAP, normal otherwise" },
+                  preferred_time: { type: ["string", "null"], description: "Preferred day/time the customer mentioned" },
+                  issue: { type: ["string", "null"], description: "Short description of the actual problem" },
+                  ready_to_book: { type: "boolean", description: "True if the customer agreed to a time or said yes to booking" },
+                },
+                additionalProperties: false,
+              },
+            },
+          }],
+          tool_choice: { type: "function", function: { name: "save_lead_details" } },
+        }),
+      });
+
+      if (extractResp.ok) {
+        const extractData = await extractResp.json();
+        const toolCall = extractData.choices?.[0]?.message?.tool_calls?.[0];
+        if (toolCall?.function?.arguments) {
+          const args = JSON.parse(toolCall.function.arguments);
+          const updates: Record<string, unknown> = {};
+          if (args.service_type && !lead.service_type) updates.service_type = args.service_type;
+          if (args.customer_name && !lead.customer_name) updates.customer_name = args.customer_name;
+          if (args.location && !lead.location) updates.location = args.location;
+          if (args.urgency && !lead.urgency) updates.urgency = args.urgency;
+          if (args.preferred_time && !lead.booked_slot) updates.booked_slot = args.preferred_time;
+          if (args.issue) {
+            const existing = (lead.job_details as Record<string, unknown>) || {};
+            updates.job_details = { ...existing, issue: args.issue };
+          }
+          if (args.ready_to_book) {
+            updates.status = "booked";
+            updates.booked_at = new Date().toISOString();
+          } else {
+            updates.status = determineStatus(replyText, body, lead.status);
+          }
+          if (Object.keys(updates).length > 0) {
+            await supabase.from("leads").update(updates).eq("id", lead.id);
+          }
+        }
+      } else {
+        // Fallback: just update status
+        const newStatus = determineStatus(replyText, body, lead.status);
+        await supabase.from("leads").update({ status: newStatus }).eq("id", lead.id);
+      }
+    } catch (e) {
+      console.error("Extraction failed:", e);
+      const newStatus = determineStatus(replyText, body, lead.status);
+      await supabase.from("leads").update({ status: newStatus }).eq("id", lead.id);
+    }
 
     const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
     return new Response(twiml, {
