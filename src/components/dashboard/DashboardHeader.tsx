@@ -1,9 +1,20 @@
-import { Phone, Settings } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { LogOut, Phone, Settings } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const DashboardHeader = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    navigate("/auth", { replace: true });
+  };
+
   return (
     <header className="border-b border-border bg-card">
       <div className="container flex items-center justify-between h-14">
@@ -25,6 +36,10 @@ const DashboardHeader = () => {
             <Settings className="w-3.5 h-3.5" />
             Settings
           </Link>
+          <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-muted-foreground hover:text-foreground">
+            <LogOut className="w-3.5 h-3.5 mr-1" />
+            Sign out
+          </Button>
         </div>
       </div>
     </header>
