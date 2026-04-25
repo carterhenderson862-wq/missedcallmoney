@@ -14,6 +14,7 @@ const Settings = () => {
   const [serviceArea, setServiceArea] = useState("");
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
+  const [demoAgentLabel, setDemoAgentLabel] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -21,6 +22,9 @@ const Settings = () => {
       setBusinessName(settings.business_name || "");
       setServiceArea((settings as any).service_area || "");
       setServices(settings.services || []);
+    }
+    if (typeof window !== "undefined") {
+      setDemoAgentLabel(window.localStorage.getItem("demoAgentLabel") || "");
     }
   }, [settings]);
 
