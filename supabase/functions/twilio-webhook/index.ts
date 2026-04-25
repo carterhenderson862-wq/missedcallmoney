@@ -380,8 +380,79 @@ serve(async (req) => {
       status: "sent",
     });
 
-    const newStatus = determineStatus(replyText, body, lead.status);
-    await supabase.from("leads").update({ status: newStatus }).eq("id", lead.id);
+    // Extract structured details from the latest customer message via tool calling
+    try {
+      const extractResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            { role: "system", content: "Extract any details the customer provided in this SMS. Only set fields explicitly mentioned. Leave others null." },
+            { role: "user", content: `Customer SMS: "${body}"\n\nKnown so far: ${JSON.stringify({ service_type: lead.service_type, customer_name: lead.customer_name, location: lead.location, urgency: lead.urgency, booked_slot: lead.booked_slot, issue: (lead.job_details as Record<string, unknown>)?.issue || null })}` },
+          ],
+          tools: [{
+            type: "function",
+            function: {
+              name: "save_lead_details",
+              description: "Save details extracted from the customer SMS.",
+              parameters: {
+                type: "object",
+                properties: {
+                  service_type: { type: ["string", "null"], description: "plumbing, HVAC, roofing, electrical, or other" },
+                  customer_name: { type: ["string", "null"] },
+                  location: { type: ["string", "null"], description: "Area, neighborhood, or address" },
+                  urgency: { type: ["string", "null"], enum: ["high", "normal", null], description: "high if urgent/emergency/ASAP, normal otherwise" },
+                  preferred_time: { type: ["string", "null"], description: "Preferred day/time the customer mentioned" },
+                  issue: { type: ["string", "null"], description: "Short description of the actual problem" },
+                  ready_to_book: { type: "boolean", description: "True if the customer agreed to a time or said yes to booking" },
+                },
+                additionalProperties: false,
+              },
+            },
+          }],
+          tool_choice: { type: "function", function: { name: "save_lead_details" } },
+        }),
+      });
+
+      if (extractResp.ok) {
+        const extractData = await extractResp.json();
+        const toolCall = extractData.choices?.[0]?.message?.tool_calls?.[0];
+        if (toolCall?.function?.arguments) {
+          const args = JSON.parse(toolCall.function.arguments);
+          const updates: Record<string, unknown> = {};
+          if (args.service_type && !lead.service_type) updates.service_type = args.service_type;
+          if (args.customer_name && !lead.customer_name) updates.customer_name = args.customer_name;
+          if (args.location && !lead.location) updates.location = args.location;
+          if (args.urgency && !lead.urgency) updates.urgency = args.urgency;
+          if (args.preferred_time && !lead.booked_slot) updates.booked_slot = args.preferred_time;
+          if (args.issue) {
+            const existing = (lead.job_details as Record<string, unknown>) || {};
+            updates.job_details = { ...existing, issue: args.issue };
+          }
+          if (args.ready_to_book) {
+            updates.status = "booked";
+            updates.booked_at = new Date().toISOString();
+          } else {
+            updates.status = determineStatus(replyText, body, lead.status);
+          }
+          if (Object.keys(updates).length > 0) {
+            await supabase.from("leads").update(updates).eq("id", lead.id);
+          }
+        }
+      } else {
+        // Fallback: just update status
+        const newStatus = determineStatus(replyText, body, lead.status);
+        await supabase.from("leads").update({ status: newStatus }).eq("id", lead.id);
+      }
+    } catch (e) {
+      console.error("Extraction failed:", e);
+      const newStatus = determineStatus(replyText, body, lead.status);
+      await supabase.from("leads").update({ status: newStatus }).eq("id", lead.id);
+    }
 
     const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
     return new Response(twiml, {
