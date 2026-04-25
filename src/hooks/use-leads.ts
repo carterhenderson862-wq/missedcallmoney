@@ -104,11 +104,11 @@ export function useSettings() {
   return useQuery({
     queryKey: ["business_settings"],
     queryFn: async () => {
+      // RLS scopes this to the current user's row (one per user, enforced by unique index)
       const { data, error } = await supabase
         .from("business_settings")
         .select("*")
-        .limit(1)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
