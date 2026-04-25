@@ -273,12 +273,7 @@ serve(async (req) => {
       });
     }
 
-    const TIMING_KEYWORDS = ["tomorrow", "today", "morning", "afternoon", "evening", "asap", "this week", "next week", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "9am", "10am", "11am", "noon", "1pm", "2pm", "3pm", "4pm", "free at", "i'm free", "im free", "available at", "can do"];
-    const PROBLEM_KEYWORDS = ["leak", "broken", "not working", "clogged", "no ac", "no heat", "no hot water", "dripping", "backed up", "running", "won't turn on", "wont turn on", "needs repair", "needs fixing", "replace", "install", "ac issue", "heater", "furnace", "toilet", "faucet", "pipe", "drain", "roof", "electrical", "outlet", "breaker"];
-    const lower = body.toLowerCase();
-    const hasTiming = TIMING_KEYWORDS.some(kw => lower.includes(kw));
-    const hasProblem = PROBLEM_KEYWORDS.some(kw => lower.includes(kw));
-    const readyToBook = hasTiming && hasProblem;
+    // (legacy keyword fast-track removed — dispatcher checklist below drives flow)
 
     // Build dispatcher checklist of what's still missing on this lead
     const missing: string[] = [];
