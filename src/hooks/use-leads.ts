@@ -106,8 +106,9 @@ export function useMessages(leadId: string | null) {
 }
 
 export function useSettings() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["business_settings"],
+    queryKey: ["business_settings", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("business_settings")
@@ -116,5 +117,6 @@ export function useSettings() {
       if (error) throw error;
       return data;
     },
+    enabled: !!user,
   });
 }

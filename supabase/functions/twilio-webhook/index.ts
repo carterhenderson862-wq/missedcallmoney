@@ -178,11 +178,28 @@ serve(async (req) => {
     const isUrgent = isInboundSms && URGENT_KEYWORDS.some(kw => body.toLowerCase().includes(kw));
 
     if (isInboundSms) {
+      // Idempotency: if Twilio retries with same MessageSid, skip duplicate work.
+      const inboundSid = params["MessageSid"] || params["SmsSid"] || null;
+      if (inboundSid) {
+        const { data: existingMsg } = await supabase
+          .from("messages")
+          .select("id")
+          .eq("twilio_sid", inboundSid)
+          .maybeSingle();
+        if (existingMsg) {
+          const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+          return new Response(twiml, {
+            headers: { ...corsHeaders, "Content-Type": "application/xml" },
+          });
+        }
+      }
+
       await supabase.from("messages").insert({
         owner_user_id: ownerUserId,
         lead_id: lead.id,
         direction: "inbound",
         body,
+        twilio_sid: inboundSid,
       });
 
       const leadUpdate: Record<string, unknown> = {};
@@ -237,13 +254,12 @@ serve(async (req) => {
         },
         body: new URLSearchParams({ To: fromNumber, From: twilioFrom, Body: replyText }),
       });
-      const smsData = await smsResponse.json();
+      const smsData = await smsResponse.json().catch(() => ({}));
       if (!smsResponse.ok) {
-        console.error("Twilio SMS error:", smsResponse.status, smsData);
-        return new Response(JSON.stringify({ error: "Internal server error" }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        console.error("Twilio SMS error (missed-call reply):", smsResponse.status, smsData);
+        // Return 200 to prevent Twilio retry storms; the inbound is already recorded as a lead.
+        const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+        return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
       }
 
       await supabase.from("messages").insert({
@@ -320,11 +336,9 @@ serve(async (req) => {
     if (!aiResponse.ok) {
       const errText = await aiResponse.text();
       console.error("AI gateway error:", aiResponse.status, errText);
-      const status = aiResponse.status === 429 || aiResponse.status === 402 ? aiResponse.status : 500;
-      return new Response(JSON.stringify({ error: "AI temporarily unavailable" }), {
-        status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      // Return 200 with empty TwiML so Twilio doesn't retry and re-trigger AI cost.
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
     }
 
     const aiData = await aiResponse.json();
@@ -332,10 +346,8 @@ serve(async (req) => {
 
     if (!replyText) {
       console.error("Empty AI response");
-      return new Response(JSON.stringify({ error: "Internal server error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
     }
 
     if (!twilioFrom) {
@@ -362,13 +374,19 @@ serve(async (req) => {
       body: new URLSearchParams({ To: fromNumber, From: twilioFrom, Body: replyText }),
     });
 
-    const smsData = await smsResponse.json();
+    const smsData = await smsResponse.json().catch(() => ({}));
     if (!smsResponse.ok) {
-      console.error("Twilio SMS error:", smsResponse.status, smsData);
-      return new Response(JSON.stringify({ error: "Internal server error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.error("Twilio SMS error (AI reply):", smsResponse.status, smsData);
+      // Return 200 to prevent retry storms; AI reply is logged below as failed.
+      await supabase.from("messages").insert({
+        owner_user_id: ownerUserId,
+        lead_id: lead.id,
+        direction: "outbound",
+        body: replyText,
+        status: "failed",
       });
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
     }
 
     await supabase.from("messages").insert({

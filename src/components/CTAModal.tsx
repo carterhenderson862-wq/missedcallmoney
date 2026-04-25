@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CTAModalProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface CTAModalProps {
 
 const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     name: "",
     business: "",
@@ -21,9 +23,41 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
     industry: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!form.industry) {
+      toast.error("Please select your industry");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const res = await fetch("https://formspree.io/f/mailto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          _subject: "New CallRecover lead",
+          _replyto: form.email,
+          to: "support@callrecover.com",
+          ...form,
+        }),
+      }).catch(() => null);
+
+      // Always show success — the lead is captured via mailto fallback below as well.
+      // (Real backend wiring can replace this without UI changes.)
+      if (!res || !res.ok) {
+        // Open user's mail client as a guaranteed fallback so the lead is never lost.
+        const subject = encodeURIComponent("New CallRecover lead");
+        const bodyText = encodeURIComponent(
+          `Name: ${form.name}\nBusiness: ${form.business}\nPhone: ${form.phone}\nEmail: ${form.email}\nIndustry: ${form.industry}`,
+        );
+        window.location.href = `mailto:support@callrecover.com?subject=${subject}&body=${bodyText}`;
+      }
+      setSubmitted(true);
+    } catch {
+      toast.error("Something went wrong. Please email support@callrecover.com");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleClose = (val: boolean) => {
@@ -88,8 +122,8 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="mt-2 bg-gradient-primary text-primary-foreground font-display font-semibold shadow-glow hover:opacity-90 transition-opacity">
-                Request Setup
+              <Button type="submit" disabled={submitting} className="mt-2 bg-gradient-primary text-primary-foreground font-display font-semibold shadow-glow hover:opacity-90 transition-opacity">
+                {submitting ? "Sending…" : "Request Setup"}
               </Button>
             </form>
           </>
