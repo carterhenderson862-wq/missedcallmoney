@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import BuiltFor from "@/components/BuiltFor";
@@ -14,31 +14,30 @@ import AsSeenWorking from "@/components/AsSeenWorking";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import TrustFooter from "@/components/TrustFooter";
-import CTAModal from "@/components/CTAModal";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
 
 const Index = () => {
-  const [ctaOpen, setCtaOpen] = useState(false);
+  const navigate = useNavigate();
+  const goToAuth = () => navigate("/auth");
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Navbar />
-      <HeroSection onCTAClick={() => setCtaOpen(true)} />
+      <HeroSection onCTAClick={goToAuth} />
       <BuiltFor />
       <Differentiators />
       <HowItWorks />
-      <PricingSection onCTAClick={() => setCtaOpen(true)} />
+      <PricingSection onCTAClick={goToAuth} />
       <RealResult />
-      <ChatDemo onCTAClick={() => setCtaOpen(true)} />
+      <ChatDemo onCTAClick={goToAuth} />
       <TestimonialCards />
       <MoneyImpact />
       <HowToStart />
       <AsSeenWorking />
       <FAQSection />
-      <CTASection onCTAClick={() => setCtaOpen(true)} />
+      <CTASection onCTAClick={goToAuth} />
       <TrustFooter />
-      <CTAModal open={ctaOpen} onOpenChange={setCtaOpen} />
-      <StickyMobileCTA onCTAClick={() => setCtaOpen(true)} />
+      <StickyMobileCTA onCTAClick={goToAuth} />
     </div>
   );
 };
