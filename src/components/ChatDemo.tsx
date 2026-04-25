@@ -27,6 +27,20 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const hasPlayedRef = useRef(false);
 
+  const [agentLabel, setAgentLabel] = useState("Your AI Agent");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("demoAgentLabel");
+    if (stored && stored.trim()) setAgentLabel(stored.trim());
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "demoAgentLabel") {
+        setAgentLabel(e.newValue?.trim() || "Your AI Agent");
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   useEffect(() => {
     const container = chatContainerRef.current;
     if (container) {
