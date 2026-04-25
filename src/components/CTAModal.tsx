@@ -122,8 +122,8 @@ const CTAModal = ({ open, onOpenChange }: CTAModalProps) => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="mt-2 bg-gradient-primary text-primary-foreground font-display font-semibold shadow-glow hover:opacity-90 transition-opacity">
-                Request Setup
+              <Button type="submit" disabled={submitting} className="mt-2 bg-gradient-primary text-primary-foreground font-display font-semibold shadow-glow hover:opacity-90 transition-opacity">
+                {submitting ? "Sending…" : "Request Setup"}
               </Button>
             </form>
           </>
