@@ -374,13 +374,19 @@ serve(async (req) => {
       body: new URLSearchParams({ To: fromNumber, From: twilioFrom, Body: replyText }),
     });
 
-    const smsData = await smsResponse.json();
+    const smsData = await smsResponse.json().catch(() => ({}));
     if (!smsResponse.ok) {
-      console.error("Twilio SMS error:", smsResponse.status, smsData);
-      return new Response(JSON.stringify({ error: "Internal server error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      console.error("Twilio SMS error (AI reply):", smsResponse.status, smsData);
+      // Return 200 to prevent retry storms; AI reply is logged below as failed.
+      await supabase.from("messages").insert({
+        owner_user_id: ownerUserId,
+        lead_id: lead.id,
+        direction: "outbound",
+        body: replyText,
+        status: "failed",
       });
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
     }
 
     await supabase.from("messages").insert({
