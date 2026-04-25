@@ -178,11 +178,28 @@ serve(async (req) => {
     const isUrgent = isInboundSms && URGENT_KEYWORDS.some(kw => body.toLowerCase().includes(kw));
 
     if (isInboundSms) {
+      // Idempotency: if Twilio retries with same MessageSid, skip duplicate work.
+      const inboundSid = params["MessageSid"] || params["SmsSid"] || null;
+      if (inboundSid) {
+        const { data: existingMsg } = await supabase
+          .from("messages")
+          .select("id")
+          .eq("twilio_sid", inboundSid)
+          .maybeSingle();
+        if (existingMsg) {
+          const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+          return new Response(twiml, {
+            headers: { ...corsHeaders, "Content-Type": "application/xml" },
+          });
+        }
+      }
+
       await supabase.from("messages").insert({
         owner_user_id: ownerUserId,
         lead_id: lead.id,
         direction: "inbound",
         body,
+        twilio_sid: inboundSid,
       });
 
       const leadUpdate: Record<string, unknown> = {};
