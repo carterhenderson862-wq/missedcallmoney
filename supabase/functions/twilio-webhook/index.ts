@@ -280,20 +280,33 @@ serve(async (req) => {
     const hasProblem = PROBLEM_KEYWORDS.some(kw => lower.includes(kw));
     const readyToBook = hasTiming && hasProblem;
 
-    if (readyToBook) {
+    // Build dispatcher checklist of what's still missing on this lead
+    const missing: string[] = [];
+    if (!lead.service_type) missing.push("service_type (plumbing/HVAC/roofing/electrical/other)");
+    if (!lead.urgency) missing.push("urgency (urgent vs scheduled)");
+    if (!lead.job_details || Object.keys((lead.job_details as Record<string, unknown>) || {}).length === 0) missing.push("issue (what exactly is wrong)");
+    if (!lead.location) missing.push("location (area or address)");
+    if (!lead.customer_name) missing.push("customer_name");
+    if (!lead.booked_slot) missing.push("preferred_time");
+
+    const nextNeeded = missing[0] || null;
+
+    if (isUrgent && !lead.urgency) {
       aiMessages.push({
         role: "system",
-        content: "FAST-TRACK: The customer has stated both their problem AND when they're available. Do NOT ask more qualifying questions. Immediately offer a specific time slot and confirm.",
+        content: "URGENT JOB DETECTED. Acknowledge urgency in 1 short sentence, then ask the next missing detail. Example: 'Got it — we'll treat this as urgent. Are you available now or later today?' 1-2 sentences max.",
       });
-    } else if (isUrgent) {
+    }
+
+    if (nextNeeded) {
       aiMessages.push({
         role: "system",
-        content: "URGENT JOB DETECTED. Acknowledge urgency in 1 short sentence, then immediately offer same-day/ASAP availability. Example tone: 'Got it—we'll treat this as urgent. Are you free now or later today?' Keep it to 1-2 sentences and always end with a scheduling question.",
+        content: `DISPATCHER CHECKLIST: Ask ONE question to capture: ${nextNeeded}. Do NOT ask anything already collected. Keep it to 1 sentence, natural and contractor-like. Examples by field:\n- service_type: "Is this for plumbing, HVAC, roofing, electrical, or something else?"\n- issue: "What's the issue exactly?"\n- location: "What area or address is this for?"\n- customer_name: "What's your name so we can put it with the request?"\n- preferred_time: "Want the earliest available, or is there a time that works best?"`,
       });
     } else {
       aiMessages.push({
         role: "system",
-        content: "NON-URGENT: Customer is flexible on timing. Move toward booking by offering next available days. Example tone: 'Perfect—what day works best for you?' Keep it warm, short, and always end with a scheduling question.",
+        content: "ALL DETAILS COLLECTED. Confirm booking intent in 1 sentence: 'Perfect — I'll mark this as ready to book and have the team confirm shortly.' Do NOT ask more questions.",
       });
     }
 
