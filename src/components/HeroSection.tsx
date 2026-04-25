@@ -9,7 +9,14 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src={heroBg} alt="" className="w-full h-full object-cover" />
+        <img
+          src={heroBg}
+          alt=""
+          className="w-full h-full object-cover"
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
+        />
         <div className="absolute inset-0 bg-background/85" />
         <div className="absolute inset-0 bg-gradient-glow" />
       </div>
