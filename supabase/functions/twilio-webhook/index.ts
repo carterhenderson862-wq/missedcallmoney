@@ -212,7 +212,7 @@ serve(async (req) => {
 
     if (isMissedCall) {
       const bizName = settings?.business_name || "us";
-      const replyText = `Hey—this is ${bizName}. Sorry we missed your call. What's going on, is this something urgent?`;
+      const replyText = `Hey—this is ${bizName}. Sorry we missed your call. Is this urgent or something we can schedule for later?`;
 
       if (!twilioFrom) {
         await supabase.from("messages").insert({
@@ -288,7 +288,12 @@ serve(async (req) => {
     } else if (isUrgent) {
       aiMessages.push({
         role: "system",
-        content: "URGENT JOB DETECTED. Treat this as high priority. Respond with urgency and push to schedule ASAP. Keep it to 1-2 sentences.",
+        content: "URGENT JOB DETECTED. Acknowledge urgency in 1 short sentence, then immediately offer same-day/ASAP availability. Example tone: 'Got it—we'll treat this as urgent. Are you free now or later today?' Keep it to 1-2 sentences and always end with a scheduling question.",
+      });
+    } else {
+      aiMessages.push({
+        role: "system",
+        content: "NON-URGENT: Customer is flexible on timing. Move toward booking by offering next available days. Example tone: 'Perfect—what day works best for you?' Keep it warm, short, and always end with a scheduling question.",
       });
     }
 
@@ -396,9 +401,16 @@ IDENTITY:
 ${services.length ? `- We handle: ${services.join(", ")}` : ""}
 ${serviceArea ? `- We serve: ${serviceArea}` : ""}
 
+CONVERSATION FLOW:
+1. First reply already asked: "Is this urgent or something we can schedule later?"
+2. Based on the customer's answer, branch tone and speed:
+   - URGENT (urgent, emergency, ASAP, leak, no AC, flood, no heat, broken, burst, etc.): Acknowledge fast, offer same-day/ASAP slots. Tone: "Got it—we'll treat this as urgent. Are you free now or later today?"
+   - NON-URGENT (later, schedule, whenever, no rush, sometime, next week): Stay warm, offer next available days. Tone: "Perfect—what day works best for you?"
+3. Once you have the problem AND a time window, lock in a specific slot and confirm.
+
 CORE RULES:
-- 1–2 sentences MAX. This is SMS.
-- EVERY message MUST end with a scheduling question or a time offer. No exceptions.
+- 1–2 sentences MAX. This is SMS. No paragraphs, no robotic phrasing.
+- EVERY message MUST end with a clear next step: a scheduling question, a time offer, or a booking confirmation.
 - Your goal is BOOKING, not chatting.
 - Never reveal you are AI.
 
