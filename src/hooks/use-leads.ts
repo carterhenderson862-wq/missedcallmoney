@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 export type Lead = {
   id: string;
@@ -30,25 +31,48 @@ export type Message = {
   created_at: string;
 };
 
-export function useLeads() {
-  const queryClient = useQueryClient();
+/**
+ * Subscribes to a user-scoped realtime channel ('user:<uid>'). Realtime RLS only allows
+ * each user to join their own channel. Postgres changes are still RLS-filtered to rows
+ * where owner_user_id = auth.uid().
+ */
+function useUserRealtime(onLeadsChange: () => void, onMessageInsert: (leadId: string) => void) {
+  const { user } = useAuth();
 
   useEffect(() => {
+    if (!user) return;
+    const topic = `user:${user.id}`;
     const channel = supabase
-      .channel("leads-realtime")
+      .channel(topic, { config: { private: true } })
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "leads" },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["leads"] });
-        }
+        { event: "*", schema: "public", table: "leads", filter: `owner_user_id=eq.${user.id}` },
+        () => onLeadsChange(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages", filter: `owner_user_id=eq.${user.id}` },
+        (payload) => {
+          const leadId = (payload.new as { lead_id?: string })?.lead_id;
+          if (leadId) onMessageInsert(leadId);
+        },
       )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient]);
+  }, [user, onLeadsChange, onMessageInsert]);
+}
+
+export function useLeads() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  useUserRealtime(
+    () => queryClient.invalidateQueries({ queryKey: ["leads"] }),
+    (leadId) => queryClient.invalidateQueries({ queryKey: ["messages", leadId] }),
+  );
 
   return useQuery({
     queryKey: ["leads"],
@@ -60,30 +84,11 @@ export function useLeads() {
       if (error) throw error;
       return data as Lead[];
     },
+    enabled: !!user,
   });
 }
 
 export function useMessages(leadId: string | null) {
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!leadId) return;
-    const channel = supabase
-      .channel(`messages-${leadId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "messages", filter: `lead_id=eq.${leadId}` },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["messages", leadId] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [leadId, queryClient]);
-
   return useQuery({
     queryKey: ["messages", leadId],
     queryFn: async () => {
@@ -104,7 +109,6 @@ export function useSettings() {
   return useQuery({
     queryKey: ["business_settings"],
     queryFn: async () => {
-      // RLS scopes this to the current user's row (one per user, enforced by unique index)
       const { data, error } = await supabase
         .from("business_settings")
         .select("*")
