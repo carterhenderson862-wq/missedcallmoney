@@ -288,7 +288,12 @@ serve(async (req) => {
     } else if (isUrgent) {
       aiMessages.push({
         role: "system",
-        content: "URGENT JOB DETECTED. Treat this as high priority. Respond with urgency and push to schedule ASAP. Keep it to 1-2 sentences.",
+        content: "URGENT JOB DETECTED. Acknowledge urgency in 1 short sentence, then immediately offer same-day/ASAP availability. Example tone: 'Got it—we'll treat this as urgent. Are you free now or later today?' Keep it to 1-2 sentences and always end with a scheduling question.",
+      });
+    } else {
+      aiMessages.push({
+        role: "system",
+        content: "NON-URGENT: Customer is flexible on timing. Move toward booking by offering next available days. Example tone: 'Perfect—what day works best for you?' Keep it warm, short, and always end with a scheduling question.",
       });
     }
 
