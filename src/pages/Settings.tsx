@@ -49,6 +49,14 @@ const Settings = () => {
         services,
       } as any)
       .eq("id", settings.id);
+    if (typeof window !== "undefined") {
+      const trimmed = demoAgentLabel.trim();
+      if (trimmed) {
+        window.localStorage.setItem("demoAgentLabel", trimmed);
+      } else {
+        window.localStorage.removeItem("demoAgentLabel");
+      }
+    }
     setSaving(false);
     if (error) {
       toast.error("Failed to save settings");
