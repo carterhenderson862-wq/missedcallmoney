@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 
 const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
-    <section className="py-[60px]">
+    <section id="pricing" className="scroll-mt-20 py-[60px]">
       <div className="container">
         <div className="max-w-lg mx-auto text-center">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-3">
