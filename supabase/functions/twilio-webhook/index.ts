@@ -212,7 +212,7 @@ serve(async (req) => {
 
     if (isMissedCall) {
       const bizName = settings?.business_name || "us";
-      const replyText = `Hey—this is ${bizName}. Sorry we missed your call. What's going on, is this something urgent?`;
+      const replyText = `Hey—this is ${bizName}. Sorry we missed your call. Is this urgent or something we can schedule for later?`;
 
       if (!twilioFrom) {
         await supabase.from("messages").insert({
