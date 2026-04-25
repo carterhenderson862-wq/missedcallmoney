@@ -336,11 +336,9 @@ serve(async (req) => {
     if (!aiResponse.ok) {
       const errText = await aiResponse.text();
       console.error("AI gateway error:", aiResponse.status, errText);
-      const status = aiResponse.status === 429 || aiResponse.status === 402 ? aiResponse.status : 500;
-      return new Response(JSON.stringify({ error: "AI temporarily unavailable" }), {
-        status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      // Return 200 with empty TwiML so Twilio doesn't retry and re-trigger AI cost.
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
     }
 
     const aiData = await aiResponse.json();
@@ -348,10 +346,8 @@ serve(async (req) => {
 
     if (!replyText) {
       console.error("Empty AI response");
-      return new Response(JSON.stringify({ error: "Internal server error" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
     }
 
     if (!twilioFrom) {
