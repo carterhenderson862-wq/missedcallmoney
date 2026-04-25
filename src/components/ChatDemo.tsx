@@ -119,7 +119,7 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                 <Bot className="w-4.5 h-4.5 text-primary" />
               </div>
               <div>
-                <div className="font-display font-semibold text-sm">Austin Plumbing AI</div>
+                <div className="font-display font-semibold text-sm">Your AI Agent</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
                   Online · Avg reply &lt;30s
