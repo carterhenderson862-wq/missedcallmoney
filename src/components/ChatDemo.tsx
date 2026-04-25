@@ -27,6 +27,20 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const hasPlayedRef = useRef(false);
 
+  const [agentLabel, setAgentLabel] = useState("Your AI Agent");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("demoAgentLabel");
+    if (stored && stored.trim()) setAgentLabel(stored.trim());
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "demoAgentLabel") {
+        setAgentLabel(e.newValue?.trim() || "Your AI Agent");
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   useEffect(() => {
     const container = chatContainerRef.current;
     if (container) {
@@ -119,7 +133,7 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                 <Bot className="w-4.5 h-4.5 text-primary" />
               </div>
               <div>
-                <div className="font-display font-semibold text-sm">Your AI Agent</div>
+                <div className="font-display font-semibold text-sm">{agentLabel}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
                   Online · Avg reply &lt;30s

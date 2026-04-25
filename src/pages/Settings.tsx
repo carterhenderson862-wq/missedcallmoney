@@ -14,6 +14,7 @@ const Settings = () => {
   const [serviceArea, setServiceArea] = useState("");
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
+  const [demoAgentLabel, setDemoAgentLabel] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -21,6 +22,9 @@ const Settings = () => {
       setBusinessName(settings.business_name || "");
       setServiceArea((settings as any).service_area || "");
       setServices(settings.services || []);
+    }
+    if (typeof window !== "undefined") {
+      setDemoAgentLabel(window.localStorage.getItem("demoAgentLabel") || "");
     }
   }, [settings]);
 
@@ -45,6 +49,14 @@ const Settings = () => {
         services,
       } as any)
       .eq("id", settings.id);
+    if (typeof window !== "undefined") {
+      const trimmed = demoAgentLabel.trim();
+      if (trimmed) {
+        window.localStorage.setItem("demoAgentLabel", trimmed);
+      } else {
+        window.localStorage.removeItem("demoAgentLabel");
+      }
+    }
     setSaving(false);
     if (error) {
       toast.error("Failed to save settings");
@@ -95,6 +107,19 @@ const Settings = () => {
               value={serviceArea}
               onChange={(e) => setServiceArea(e.target.value)}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="demoAgentLabel">Chat Demo Header Label (optional)</Label>
+            <Input
+              id="demoAgentLabel"
+              placeholder="Your AI Agent"
+              value={demoAgentLabel}
+              onChange={(e) => setDemoAgentLabel(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Shown at the top of the landing page chat demo. Leave blank to use the default "Your AI Agent".
+            </p>
           </div>
 
           <div className="space-y-2">
