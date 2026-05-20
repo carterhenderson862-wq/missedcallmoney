@@ -7,24 +7,24 @@ import {
 
 const faqs = [
   {
-    q: "Does this change my phone number?",
-    a: "No. CallRecover works alongside your existing phone number. Your customers keep calling the same number they always have — we just catch the ones you miss.",
+    q: "Do I need to change my business phone number?",
+    a: "No. You can forward missed calls to CallRecover or connect a dedicated number.",
   },
   {
-    q: "What if the customer calls back?",
-    a: "Great — you answer like normal. If you're still busy, we'll keep the text conversation going until they're booked or tell us to stop.",
+    q: "What happens when I miss a call?",
+    a: "The customer gets an instant text, the AI asks what they need, and the lead gets organized in your dashboard.",
   },
   {
-    q: "Is this TCPA compliant?",
-    a: "Yes. We only text people who called your business first. That's an established business relationship, and our messages are transactional, not promotional. We also honor opt-out requests immediately.",
+    q: "Does this replace my staff?",
+    a: "No. It helps capture leads when no one answers.",
   },
   {
-    q: "How fast does the AI respond?",
-    a: "On average, within 28 seconds of the missed call. The faster you respond, the more likely they book — and most competitors take hours or never respond at all.",
+    q: "Can I cancel anytime?",
+    a: "Yes. No contracts.",
   },
   {
-    q: "What trades does this work for?",
-    a: "Any service business that books appointments: plumbing, HVAC, roofing, electrical, landscaping, pest control, cleaning, and more. If you miss calls and lose jobs, this works for you.",
+    q: "What businesses is this for?",
+    a: "Plumbers, HVAC companies, roofers, electricians, landscapers, pest control, and other service businesses.",
   },
 ];
 
