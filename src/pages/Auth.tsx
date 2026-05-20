@@ -70,16 +70,16 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="font-display text-3xl font-bold text-foreground">
-            {mode === "signin" ? "Sign in" : "Create your account"}
+        <div className="text-center mb-10">
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+            {mode === "signin" ? "Welcome back." : "Start recovering missed calls."}
           </h1>
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-sm text-muted-foreground mt-3">
             {mode === "signin"
-              ? "Welcome back to your dashboard."
-              : "Start recovering missed calls in minutes."}
+              ? "Sign in to your CallRecover dashboard."
+              : "Create your account to try CallRecover on your next missed call."}
           </p>
         </div>
 
