@@ -29,16 +29,16 @@ const Index = () => {
       <BuiltFor />
       <Differentiators />
       <HowItWorks />
-          <PricingSection onCTAClick={goToAuth} />
-          <SetupSimple />
-          <RealResult />
-          <ComparisonSection />
-          <ChatDemo onCTAClick={goToAuth} />
-          <TestimonialCards />
-          <MoneyImpact />
-          <HowToStart />
-          <AsSeenWorking />
-          <FAQSection />
+      <PricingSection onCTAClick={goToAuth} />
+      <SetupSimple />
+      <RealResult />
+      <ComparisonSection />
+      <ChatDemo onCTAClick={goToAuth} />
+      <TestimonialCards />
+      <MoneyImpact />
+      <HowToStart />
+      <AsSeenWorking />
+      <FAQSection />
       <CTASection onCTAClick={goToAuth} />
       <TrustFooter />
       <StickyMobileCTA onCTAClick={goToAuth} />
