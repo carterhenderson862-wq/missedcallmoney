@@ -19,9 +19,9 @@ const conversation: Message[] = [
 ];
 
 const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
-  const [visibleMessages, setVisibleMessages] = useState<number>(0);
+  const [visibleMessages, setVisibleMessages] = useState<number>(conversation.length);
   const [isTyping, setIsTyping] = useState(false);
-  const [showBooked, setShowBooked] = useState(false);
+  const [showBooked, setShowBooked] = useState(true);
   const sectionRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
