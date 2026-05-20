@@ -14,7 +14,7 @@ const AsSeenWorking = () => {
     <section className="py-12 md:py-16">
       <div className="container">
         <p className="text-center text-muted-foreground text-sm uppercase tracking-widest mb-6">
-          As seen working for:
+          Industries we serve
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           {trades.map((trade) => (
