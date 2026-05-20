@@ -1,6 +1,6 @@
 import { Check } from "lucide-react";
 
-const trades = ["Plumbers", "HVAC companies", "Roofers", "Electricians"];
+const trades = ["Plumbers", "HVAC companies", "Roofers", "Electricians", "Landscapers", "Pest Control"];
 
 const BuiltFor = () => {
   return (

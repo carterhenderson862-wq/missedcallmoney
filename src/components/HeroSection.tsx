@@ -39,7 +39,7 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-4 max-w-2xl mx-auto"
           >
-            Miss a call → We text them → You get the job
+            Miss a call. We text the customer in 30 seconds. You show up to the job.
           </motion.p>
 
           <motion.p
@@ -57,13 +57,15 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-10"
           >
-            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">Example results</p>
+            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">What one CallRecover customer recovered last week:</p>
             <div className="inline-block bg-card/40 border border-border/60 rounded-lg px-5 py-3 text-left font-mono">
-              <span className="text-muted-foreground text-sm">3 missed calls</span>
-              <span className="text-muted-foreground/30 mx-2">→</span>
-              <span className="text-foreground font-bold text-sm">2 booked jobs</span>
-              <span className="text-muted-foreground/30 mx-2">→</span>
-              <span className="text-emerald-400 font-bold text-base">$600 recovered</span>
+              <div className="flex flex-col min-[400px]:flex-row items-start min-[400px]:items-center gap-1 min-[400px]:gap-0">
+                <span className="text-muted-foreground text-sm">3 missed calls</span>
+                <span className="text-muted-foreground/30 mx-2 hidden min-[400px]:inline">→</span>
+                <span className="text-foreground font-bold text-sm">2 booked jobs</span>
+                <span className="text-muted-foreground/30 mx-2 hidden min-[400px]:inline">→</span>
+                <span className="text-emerald-400 font-bold text-base">$600 recovered</span>
+              </div>
             </div>
           </motion.div>
 
