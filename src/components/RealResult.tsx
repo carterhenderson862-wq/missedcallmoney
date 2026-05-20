@@ -39,7 +39,7 @@ const RealResult = () => {
         </div>
 
         <p className="text-center text-muted-foreground text-sm mt-6">
-          Works with your current number. No setup. No changes.
+          Works with your current number. We help you get set up.
         </p>
       </div>
     </section>
