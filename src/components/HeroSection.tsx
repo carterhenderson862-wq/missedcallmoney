@@ -39,7 +39,7 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-4 max-w-2xl mx-auto"
           >
-            Miss a call → We text them → You get the job
+            Miss a call. We text the customer in 30 seconds. You show up to the job.
           </motion.p>
 
           <motion.p
