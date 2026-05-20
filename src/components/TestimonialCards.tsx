@@ -30,7 +30,7 @@ const TestimonialCards = () => {
     <section className="py-[60px] bg-secondary/60">
       <div className="container">
         <h2 className="font-display text-3xl md:text-4xl font-bold text-center mb-4">
-          Real jobs, recovered
+          Example jobs CallRecover is built to recover
         </h2>
         <p className="text-muted-foreground text-center mb-10 max-w-lg mx-auto">
           From contractors who stopped losing money to voicemail.
