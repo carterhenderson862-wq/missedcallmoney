@@ -5,7 +5,9 @@ import BuiltFor from "@/components/BuiltFor";
 import Differentiators from "@/components/Differentiators";
 import HowItWorks from "@/components/HowItWorks";
 import PricingSection from "@/components/PricingSection";
+import SetupSimple from "@/components/SetupSimple";
 import RealResult from "@/components/RealResult";
+import ComparisonSection from "@/components/ComparisonSection";
 import ChatDemo from "@/components/ChatDemo";
 import TestimonialCards from "@/components/TestimonialCards";
 import MoneyImpact from "@/components/MoneyImpact";
@@ -28,7 +30,9 @@ const Index = () => {
       <Differentiators />
       <HowItWorks />
       <PricingSection onCTAClick={goToAuth} />
+      <SetupSimple />
       <RealResult />
+      <ComparisonSection />
       <ChatDemo onCTAClick={goToAuth} />
       <TestimonialCards />
       <MoneyImpact />
