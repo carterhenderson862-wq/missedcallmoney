@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
@@ -70,8 +71,15 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-background px-4 py-6 md:py-12">
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to home
+      </Link>
+      <div className="w-full max-w-md mx-auto flex flex-col justify-center min-h-[calc(100vh-6rem)]">
         <div className="text-center mb-10">
           <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
             {mode === "signin" ? "Welcome back." : "Start recovering missed calls."}
