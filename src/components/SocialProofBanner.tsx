@@ -8,7 +8,7 @@ const SocialProofBanner = () => {
           <Star key={i} className="w-4 h-4 fill-primary text-primary" />
         ))}
       </div>
-      <span>Join 142 contractors already recovering missed calls</span>
+      <span>Built for contractors who can't afford to miss calls.</span>
     </div>
   );
 };
