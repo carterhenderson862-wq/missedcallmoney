@@ -5,6 +5,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { AdminRoute } from "@/components/AdminRoute";
 import Index from "./pages/Index.tsx";
 
 const Auth = lazy(() => import("./pages/Auth.tsx"));
@@ -46,9 +47,9 @@ const App = () => (
             <Route
               path="/admin"
               element={
-                <ProtectedRoute>
+              <AdminRoute>
                   <Admin />
-                </ProtectedRoute>
+                </AdminRoute>
               }
             />
             <Route path="/privacy" element={<Privacy />} />
