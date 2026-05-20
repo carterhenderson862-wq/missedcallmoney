@@ -20,14 +20,11 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             </div>
             <div className="mb-3">
               <span className="text-muted-foreground text-sm">Then </span>
-              <span className="font-display text-4xl font-bold text-foreground">$97</span>
+              <span className="font-display text-4xl font-bold text-foreground">$249</span>
               <span className="text-muted-foreground text-lg">/month</span>
             </div>
             <p className="text-sm text-muted-foreground/70 mb-2">
-              Most missed calls are worth <span className="font-bold text-foreground">$100–$1,000+</span> in jobs.
-            </p>
-            <p className="text-sm text-muted-foreground/70 mb-2">
-              If this recovers just <span className="font-bold text-foreground">one job</span>, it pays for itself <span className="font-bold text-foreground">3x over</span>.
+              If this recovers just <span className="font-bold text-foreground">one job</span>, it pays for itself.
             </p>
             <p className="text-xs text-muted-foreground/50 mb-8">
               No risk. Cancel anytime.
