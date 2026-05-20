@@ -14,6 +14,9 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
           </p>
 
           <div className="rounded-2xl border border-border bg-card p-8 md:p-10 text-center">
+            <p className="text-base text-foreground mb-5">
+              One recovered job can pay for <span className="font-bold">months</span> of CallRecover.
+            </p>
             <div className="mb-2">
               <span className="font-display text-2xl md:text-3xl font-bold text-primary">Free trial</span>
               <span className="text-muted-foreground text-base ml-1">(7 days)</span>
@@ -23,9 +26,6 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
               <span className="font-display text-4xl font-bold text-foreground">$249</span>
               <span className="text-muted-foreground text-lg">/month</span>
             </div>
-            <p className="text-sm text-muted-foreground/70 mb-2">
-              If this recovers just <span className="font-bold text-foreground">one job</span>, it pays for itself.
-            </p>
             <p className="text-xs text-muted-foreground/50 mb-8">
               No risk. Cancel anytime.
             </p>
