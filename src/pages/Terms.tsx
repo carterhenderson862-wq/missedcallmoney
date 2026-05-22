@@ -87,6 +87,21 @@ const Terms = () => {
           </section>
 
           <section>
+            <h2 className="font-display text-2xl font-semibold mb-3">
+              SMS consent &amp; messaging policy
+            </h2>
+            <p className="text-muted-foreground">
+              Customers may receive SMS messages from CallRecover-powered service businesses only after they initiate contact by calling the business phone number or submitting a service request. These messages are used for missed-call follow-up, service request questions, scheduling, appointment confirmation, and appointment follow-up. Message frequency varies based on the customer interaction. Message and data rates may apply. Reply STOP to opt out. Reply HELP for help. No marketing or promotional messages are sent unless separately agreed to. Customer phone numbers and message content are used only for service communication and scheduling. We do not sell or share customer data for marketing.
+            </p>
+            <p className="text-muted-foreground mt-2">
+              For the full policy, see{" "}
+              <Link to="/sms-consent" className="text-primary hover:underline font-medium">
+                SMS Consent &amp; Messaging Policy
+              </Link>.
+            </p>
+          </section>
+
+          <section>
             <h2 className="font-display text-2xl font-semibold mb-3">Contact</h2>
             <p className="text-muted-foreground">
               Questions about these terms? Email us at{" "}
