@@ -26,6 +26,10 @@ const faqs = [
     q: "What businesses is this for?",
     a: "Plumbers, HVAC companies, roofers, electricians, landscapers, pest control, and other service businesses.",
   },
+  {
+    q: "What does it cost?",
+    a: "CallRecover starts with a 7-day free trial, then $249/month. One recovered job can cover your month.",
+  },
 ];
 
 const FAQSection = () => {
