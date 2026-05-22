@@ -76,19 +76,25 @@ const SmsConsent = () => {
             </p>
           </section>
 
-          <section>
-            <h2 className="font-display text-2xl font-semibold mb-3">Related policies</h2>
-            <p className="text-muted-foreground">
-              See also our{" "}
-              <Link to="/privacy" className="text-primary hover:underline font-medium">
-                Privacy Policy
-              </Link>{" "}
-              and{" "}
-              <Link to="/terms" className="text-primary hover:underline font-medium">
-                Terms &amp; Conditions
-              </Link>{" "}
-              for more details.
-            </p>
+          <section className="border-t border-border pt-8">
+            <h2 className="font-display text-2xl font-semibold mb-4">More</h2>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/privacy" className="text-primary hover:underline font-medium">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-primary hover:underline font-medium">
+                  Terms and Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/" className="text-primary hover:underline font-medium">
+                  Back to Home
+                </Link>
+              </li>
+            </ul>
           </section>
         </div>
       </div>
