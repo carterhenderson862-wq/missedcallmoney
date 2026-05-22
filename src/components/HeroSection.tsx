@@ -57,7 +57,7 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-10"
           >
-            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">What one CallRecover customer recovered last week:</p>
+            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">One customer, last week:</p>
             <div className="inline-block bg-card/40 border border-border/60 rounded-lg px-5 py-3 text-left font-mono">
               <div className="flex flex-col min-[400px]:flex-row items-start min-[400px]:items-center gap-1 min-[400px]:gap-0">
                 <span className="text-muted-foreground text-sm">3 missed calls</span>
