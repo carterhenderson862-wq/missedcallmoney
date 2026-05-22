@@ -13,7 +13,7 @@ const SetupSimple = () => {
       <div className="container">
         <div className="text-center mb-12">
           <h2 className="font-display text-3xl md:text-5xl font-bold">
-            Setup is <span className="text-gradient">simple.</span>
+            What you do on <span className="text-gradient">day 1</span>
           </h2>
         </div>
 
