@@ -103,9 +103,3 @@ const SmsConsent = () => {
 };
 
 export default SmsConsent;
-      </div>
-    </main>
-  );
-};
-
-export default SmsConsent;
