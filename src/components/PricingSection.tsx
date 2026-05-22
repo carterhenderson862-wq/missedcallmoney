@@ -14,17 +14,20 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
           </p>
 
           <div className="rounded-2xl border border-border bg-card p-8 md:p-10 text-center">
-            <p className="text-base text-foreground mb-5">
-              One recovered job can pay for <span className="font-bold">months</span> of CallRecover.
+            <p className="text-base text-foreground mb-1">
+              One recovered job can <span className="font-bold">cover your month.</span>
             </p>
-            <div className="mb-2">
-              <span className="font-display text-2xl md:text-3xl font-bold text-primary">Free trial</span>
-              <span className="text-muted-foreground text-base ml-1">(7 days)</span>
+            <p className="text-xs text-muted-foreground mb-6">
+              Recover even 1–2 jobs per month and CallRecover can pay for itself.
+            </p>
+            <div className="mb-4 flex justify-center">
+              <span className="inline-block rounded-full bg-primary/15 text-primary text-xs font-display font-semibold px-3 py-1.5 uppercase tracking-wide">
+                7-day free trial — no card required
+              </span>
             </div>
-            <div className="mb-3">
-              <span className="text-muted-foreground text-sm">Then </span>
-              <span className="font-display text-4xl font-bold text-foreground">$249</span>
-              <span className="text-muted-foreground text-lg">/month</span>
+            <div className="mb-3 flex items-baseline justify-center gap-1.5">
+              <span className="font-display text-6xl font-bold text-foreground leading-none">$249</span>
+              <span className="text-muted-foreground/70 text-base">/ month</span>
             </div>
             <p className="text-xs text-muted-foreground/50 mb-8">
               No risk. Cancel anytime.
