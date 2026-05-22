@@ -3,7 +3,7 @@ import { UserPlus, Building2, PhoneForwarded, TrendingUp } from "lucide-react";
 const steps = [
   { icon: UserPlus, text: "Create your account" },
   { icon: Building2, text: "Add your business details" },
-  { icon: PhoneForwarded, text: "Connect or forward your missed calls" },
+  { icon: PhoneForwarded, text: "Forward your missed calls" },
   { icon: TrendingUp, text: "Start recovering leads" },
 ];
 
