@@ -22,7 +22,7 @@ const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
               onClick={onCTAClick}
               className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-10 py-6 shadow-glow hover:opacity-90 transition-opacity"
             >
-              Try it on your calls
+              Start your 7-day free trial
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <p className="mt-6 text-sm text-muted-foreground/60">

@@ -19,6 +19,9 @@ const MoneyImpact = () => {
             <p className="text-lg md:text-xl text-muted-foreground max-w-lg mx-auto">
               We recover those automatically.
             </p>
+            <p className="text-xs text-muted-foreground/60 mt-4">
+              Based on 12 missed calls × $300 average job value.
+            </p>
           </div>
         </div>
       </div>

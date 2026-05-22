@@ -246,7 +246,7 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                   variant="outline"
                   size="lg"
                   onClick={handleReplay}
-                  className="font-display font-medium text-sm px-6 py-5 border-border hover:bg-secondary"
+                  className="font-display font-medium text-sm px-6 py-5 border-2 border-primary/40 text-foreground bg-transparent hover:bg-primary/10 hover:border-primary hover:text-primary transition-colors cursor-pointer"
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Replay Demo
@@ -258,7 +258,7 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                 onClick={onCTAClick}
                 className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-8 py-6 shadow-glow hover:opacity-90 transition-opacity"
               >
-                Try it on your next missed call
+                See it work on your calls
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
           </div>
