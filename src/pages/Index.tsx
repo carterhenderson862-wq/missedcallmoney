@@ -1,9 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
-import BuiltFor from "@/components/BuiltFor";
 import Differentiators from "@/components/Differentiators";
-import HowItWorks from "@/components/HowItWorks";
 import PricingSection from "@/components/PricingSection";
 import SetupSimple from "@/components/SetupSimple";
 import RealResult from "@/components/RealResult";
@@ -26,9 +24,7 @@ const Index = () => {
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Navbar />
       <HeroSection onCTAClick={goToAuth} />
-      <BuiltFor />
       <Differentiators />
-      <HowItWorks />
       <PricingSection onCTAClick={goToAuth} />
       <SetupSimple />
       <RealResult />
