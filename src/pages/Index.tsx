@@ -32,7 +32,7 @@ const Index = () => {
       <ChatDemo onCTAClick={goToAuth} />
       <TestimonialCards />
       <MoneyImpact />
-      <HowToStart />
+      
       <AsSeenWorking />
       <FAQSection />
       <CTASection onCTAClick={goToAuth} />
