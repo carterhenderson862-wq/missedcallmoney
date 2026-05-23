@@ -249,7 +249,7 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                   className="font-display font-medium text-sm px-6 py-5 border-2 border-primary/40 text-foreground bg-transparent hover:bg-primary/10 hover:border-primary hover:text-primary transition-colors cursor-pointer"
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
-                  Replay Demo
+                  &#x21bb; Replay Demo
                 </Button>
               </motion.div>
             )}

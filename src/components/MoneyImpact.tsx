@@ -11,7 +11,7 @@ const MoneyImpact = () => {
               <DollarSign className="w-7 h-7" />
             </div>
             <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
-              You missed 12 calls this week.
+              The average contractor misses 12 calls/week.
             </h2>
             <p className="font-display text-2xl md:text-3xl font-bold text-gradient mb-4">
               That's potentially $3,600 in lost jobs.
