@@ -42,21 +42,20 @@ const TestimonialCards = () => {
               key={t.name}
               className="rounded-2xl border border-border bg-card p-7 flex flex-col"
             >
+              <span className="self-start inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-xs font-display font-bold text-emerald-400 uppercase tracking-wide mb-4">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                {t.value} recovered
+              </span>
               <p className="text-foreground leading-relaxed flex-1 mb-5 text-sm">
                 "{t.quote}"
               </p>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-display font-semibold text-foreground text-sm">
-                    {t.name}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {t.trade} · {t.location}
-                  </div>
+              <div>
+                <div className="font-display font-semibold text-foreground text-sm">
+                  {t.name}
                 </div>
-                <span className="text-primary font-bold font-display text-lg">
-                  {t.value}
-                </span>
+                <div className="text-xs text-muted-foreground">
+                  {t.trade} · {t.location}
+                </div>
               </div>
             </div>
           ))}

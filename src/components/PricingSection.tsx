@@ -20,9 +20,12 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             <p className="text-xs text-muted-foreground mb-6">
               Recover even 1–2 jobs per month and CallRecover can pay for itself.
             </p>
-            <div className="mb-4 flex justify-center">
+            <div className="mb-4 flex flex-wrap justify-center gap-2">
               <span className="inline-block rounded-full bg-primary/15 text-primary text-xs font-display font-semibold px-3 py-1.5 uppercase tracking-wide">
                 7-day free trial — no card required
+              </span>
+              <span className="inline-block rounded-full bg-secondary text-foreground text-xs font-display font-semibold px-3 py-1.5 uppercase tracking-wide border border-border">
+                Cancel anytime
               </span>
             </div>
             <div className="mb-3 flex items-baseline justify-center gap-1.5 flex-wrap">

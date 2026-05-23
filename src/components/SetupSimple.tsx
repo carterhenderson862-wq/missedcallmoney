@@ -1,10 +1,10 @@
-import { UserPlus, Building2, PhoneForwarded, TrendingUp } from "lucide-react";
+import { PhoneForwarded, Building2, PhoneMissed, CalendarCheck } from "lucide-react";
 
 const steps = [
-  { icon: UserPlus, text: "Create your account" },
-  { icon: Building2, text: "Add your business details" },
-  { icon: PhoneForwarded, text: "Forward your missed calls" },
-  { icon: TrendingUp, text: "Start recovering leads" },
+  { icon: PhoneForwarded, text: "Connect your number", description: "Forward missed calls in 2 minutes. Works with your existing line." },
+  { icon: Building2, text: "Add your business details", description: "Hours, services, pricing — so the AI sounds like you." },
+  { icon: PhoneMissed, text: "Miss a call", description: "You're on a job, driving, or off the clock. Life happens." },
+  { icon: CalendarCheck, text: "Watch it book a job", description: "Our AI texts back in seconds and gets the job on your calendar." },
 ];
 
 const SetupSimple = () => {
@@ -15,6 +15,9 @@ const SetupSimple = () => {
           <h2 className="font-display text-3xl md:text-5xl font-bold">
             What you do on <span className="text-gradient">day 1</span>
           </h2>
+          <p className="text-sm text-muted-foreground mt-3 max-w-xl mx-auto">
+            Set it up once. Then every missed call gets handled automatically.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
@@ -29,7 +32,8 @@ const SetupSimple = () => {
               <span className="text-xs text-muted-foreground font-display font-medium uppercase tracking-widest mb-2">
                 Step {i + 1}
               </span>
-              <p className="font-display text-base font-semibold">{step.text}</p>
+              <p className="font-display text-base font-semibold mb-2">{step.text}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
             </div>
           ))}
         </div>

@@ -9,7 +9,7 @@ import ComparisonSection from "@/components/ComparisonSection";
 import ChatDemo from "@/components/ChatDemo";
 import TestimonialCards from "@/components/TestimonialCards";
 import MoneyImpact from "@/components/MoneyImpact";
-import HowToStart from "@/components/HowToStart";
+
 import AsSeenWorking from "@/components/AsSeenWorking";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
@@ -32,7 +32,7 @@ const Index = () => {
       <ChatDemo onCTAClick={goToAuth} />
       <TestimonialCards />
       <MoneyImpact />
-      <HowToStart />
+      
       <AsSeenWorking />
       <FAQSection />
       <CTASection onCTAClick={goToAuth} />
