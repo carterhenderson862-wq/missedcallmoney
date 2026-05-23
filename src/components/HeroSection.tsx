@@ -57,18 +57,17 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             className="mb-10"
           >
             <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">One customer, last week:</p>
-            <div className="inline-block bg-card/40 border border-border/60 rounded-lg px-5 py-3 text-left font-mono">
-              <div className="flex flex-col min-[400px]:flex-row items-start min-[400px]:items-center gap-1 min-[400px]:gap-0">
-                <span className="text-muted-foreground text-sm">3 missed calls</span>
-                <span className="text-muted-foreground/30 mx-2 hidden min-[400px]:inline">→</span>
-                <span className="text-foreground font-bold text-sm">2 booked jobs</span>
-                <span className="text-muted-foreground/30 mx-2 hidden min-[400px]:inline">→</span>
-                <span className="text-emerald-400 font-bold text-base">$600 recovered</span>
+            <div className="inline-block bg-card/40 border border-border/60 rounded-lg px-5 sm:px-7 py-3 sm:py-4 text-left font-mono max-w-full">
+              <div className="flex flex-col min-[480px]:flex-row items-start min-[480px]:items-center gap-2 min-[480px]:gap-3">
+                <span className="text-muted-foreground text-sm whitespace-nowrap">3 missed calls</span>
+                <span className="text-muted-foreground/30 hidden min-[480px]:inline">→</span>
+                <span className="text-foreground font-bold text-sm whitespace-nowrap">2 booked jobs</span>
+                <span className="text-muted-foreground/30 hidden min-[480px]:inline">→</span>
+                <span className="text-emerald-400 font-bold text-base whitespace-nowrap">$600 recovered</span>
               </div>
             </div>
           </motion.div>
 
-          <SocialProofBanner />
 
           <div className="flex items-center justify-center gap-1.5 mt-4 text-xs text-muted-foreground/60">
             <Zap className="w-3.5 h-3.5 text-primary" />
