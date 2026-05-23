@@ -25,8 +25,8 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
                 7-day free trial — no card required
               </span>
             </div>
-            <div className="mb-3 flex items-baseline justify-center gap-1.5">
-              <span className="font-display text-6xl font-bold text-foreground leading-none">$249</span>
+            <div className="mb-3 flex items-baseline justify-center gap-1.5 flex-wrap">
+              <span className="font-display text-5xl sm:text-6xl font-bold text-foreground leading-none">$249</span>
               <span className="text-muted-foreground/70 text-base">/ month</span>
             </div>
             <p className="text-xs text-muted-foreground/50 mb-8">
