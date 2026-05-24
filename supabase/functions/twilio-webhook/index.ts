@@ -80,6 +80,19 @@ function customerConfirmedBooking(text: string): boolean {
   return BOOKING_AFFIRMATIVES.some((re) => re.test(t));
 }
 
+// Carrier-standard SMS opt-out keywords. Twilio's Messaging Service handles
+// the actual STOP/HELP auto-reply; we still stop our automation locally.
+const OPT_OUT_KEYWORDS = ["STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT"];
+function isOptOut(text: string): boolean {
+  const t = (text || "").trim().toUpperCase();
+  if (!t) return false;
+  return OPT_OUT_KEYWORDS.some((k) => t === k || new RegExp(`\\b${k}\\b`).test(t));
+}
+function isHelpRequest(text: string): boolean {
+  const t = (text || "").trim().toUpperCase();
+  return t === "HELP" || t === "INFO";
+}
+
 
 /**
  * Validate Twilio webhook signature.
