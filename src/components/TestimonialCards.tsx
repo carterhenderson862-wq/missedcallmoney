@@ -40,11 +40,11 @@ const TestimonialCards = () => {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="rounded-2xl border border-border bg-card p-7 flex flex-col"
+              className="relative rounded-2xl border border-border bg-card p-7 pt-14 flex flex-col"
             >
-              <span className="self-start inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 text-xs font-display font-bold text-emerald-400 uppercase tracking-wide mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                {t.value} recovered
+              <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-3.5 py-1.5 text-sm font-display font-bold text-emerald-400 uppercase tracking-wide">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                {t.value} RECOVERED
               </span>
               <p className="text-foreground leading-relaxed flex-1 mb-5 text-sm">
                 "{t.quote}"

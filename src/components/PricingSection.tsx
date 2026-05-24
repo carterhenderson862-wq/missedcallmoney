@@ -32,16 +32,12 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
               <span className="font-display text-5xl sm:text-6xl font-bold text-foreground leading-none">$249</span>
               <span className="text-muted-foreground/70 text-base">/ month</span>
             </div>
-            <p className="text-xs text-muted-foreground/50 mb-8">
-              No risk. Cancel anytime.
-            </p>
 
             <ul className="space-y-3 text-sm text-foreground mb-8 text-left max-w-xs mx-auto">
               {[
                 "Unlimited missed call recovery",
                 "AI-powered text conversations",
                 "Automatic booking",
-                "Cancel anytime",
                 "No contracts",
                 "No setup fees",
               ].map((item) => (

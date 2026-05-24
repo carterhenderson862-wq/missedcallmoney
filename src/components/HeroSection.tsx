@@ -38,7 +38,7 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-4 max-w-2xl mx-auto"
           >
-            Miss a call. We text the customer in 30 seconds. You show up to the job.
+            You miss a call. We text the customer in 30 seconds and turn it into a booked job.
           </motion.p>
 
           <motion.p
@@ -56,9 +56,9 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-10"
           >
-            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">One customer, last week:</p>
-            <div className="inline-block bg-card/40 border border-border/60 rounded-lg px-5 sm:px-7 py-3 sm:py-4 text-left font-mono max-w-full">
-              <div className="flex flex-col min-[480px]:flex-row items-start min-[480px]:items-center gap-2 min-[480px]:gap-3">
+            <p className="text-xs text-muted-foreground/50 uppercase tracking-widest mb-2 font-mono">THIS WEEK ACROSS CALLRECOVER</p>
+            <div className="inline-block bg-card/40 border border-border/60 rounded-lg px-6 sm:px-8 py-3 sm:py-4 text-left font-mono max-w-full">
+              <div className="flex flex-col min-[480px]:flex-row items-start min-[480px]:items-center gap-3 min-[480px]:gap-4">
                 <span className="text-muted-foreground text-sm whitespace-nowrap">3 missed calls</span>
                 <span className="text-muted-foreground/30 hidden min-[480px]:inline">→</span>
                 <span className="text-foreground font-bold text-sm whitespace-nowrap">2 booked jobs</span>
