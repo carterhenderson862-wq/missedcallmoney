@@ -57,7 +57,7 @@ const PricingSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
               onClick={onCTAClick}
               className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-10 py-6 shadow-glow hover:opacity-90 transition-opacity w-full"
             >
-              Start free trial
+              Start your 7-day free trial
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

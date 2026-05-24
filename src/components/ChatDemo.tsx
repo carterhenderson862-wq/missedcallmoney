@@ -114,11 +114,15 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
   return (
     <section className="py-[60px] bg-card">
       <div className="container">
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
             This turned a missed call into a{" "}
             <span className="text-gradient">$300+ job</span>
           </h2>
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-4 py-1.5 text-sm font-display font-semibold text-emerald-400">
+            <CheckCircle2 className="w-4 h-4" />
+            Ends in: Appointment Confirmed
+          </div>
         </div>
 
         <div
@@ -237,22 +241,16 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
 
           {/* Replay + CTA buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-            {showBooked && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={handleReplay}
-                  className="font-display font-medium text-sm px-6 py-5 border-2 border-primary/40 text-foreground bg-transparent hover:bg-primary/10 hover:border-primary hover:text-primary transition-colors cursor-pointer"
-                >
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Replay Demo
-                </Button>
-              </motion.div>
-            )}
+            <Button
+              variant="outline"
+              size="lg"
+              type="button"
+              onClick={handleReplay}
+              className="font-display font-medium text-sm px-6 py-5 border-2 border-primary/40 text-foreground bg-transparent hover:bg-primary/10 hover:border-primary hover:text-primary transition-colors cursor-pointer"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Replay Demo
+            </Button>
             <Button
                 size="lg"
                 onClick={onCTAClick}
