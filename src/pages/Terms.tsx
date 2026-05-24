@@ -26,9 +26,11 @@ const Terms = () => {
               Service description
             </h2>
             <p className="text-muted-foreground">
-              Our service automatically responds to missed calls on behalf of local service businesses by
-              sending SMS text messages to callers. The system qualifies leads, answers basic questions, and
-              helps schedule jobs through automated text conversations, with results visible in your
+              <span className="font-semibold text-foreground">CallRecover</span> is a missed-call
+              recovery and SMS scheduling assistance service for local service businesses. The
+              service automatically responds to missed calls on behalf of the business by sending
+              SMS text messages to callers. It qualifies leads, answers basic questions, and helps
+              schedule jobs through automated text conversations, with results visible in your
               dashboard.
             </p>
           </section>
