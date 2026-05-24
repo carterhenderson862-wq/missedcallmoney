@@ -342,6 +342,18 @@ serve(async (req) => {
       // We additionally: stop all automation, mark open leads as "lost", log the event,
       // and short-circuit before any AI generation or outbound send.
       if (isOptOut(body)) {
+        // Persist to global opt-out list (idempotent via UNIQUE constraint).
+        await supabase
+          .from("sms_opt_outs")
+          .upsert(
+            {
+              owner_user_id: ownerUserId,
+              phone_number: fromNumber,
+              source_message: body.slice(0, 500),
+              opted_out_at: new Date().toISOString(),
+            },
+            { onConflict: "owner_user_id,phone_number" },
+          );
         await supabase
           .from("leads")
           .update({ status: "lost", next_follow_up_at: null, follow_up_count: 0 })
