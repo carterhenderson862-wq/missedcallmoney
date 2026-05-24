@@ -79,7 +79,7 @@ function customerConfirmedBooking(text: string): boolean {
   if (BOOKING_NEGATIONS.some((re) => re.test(t))) return false;
   return BOOKING_AFFIRMATIVES.some((re) => re.test(t));
 }
-export { customerConfirmedBooking, safeTransition, detectInjection, sanitizeSmsBody };
+
 
 /**
  * Validate Twilio webhook signature.
