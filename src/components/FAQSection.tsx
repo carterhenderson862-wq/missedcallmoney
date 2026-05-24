@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     q: "Does this replace my staff?",
-    a: "No. It helps capture leads when no one answers.",
+    a: "No. It backs them up when nobody answers, so missed calls still get a fast response.",
   },
   {
     q: "Can I cancel anytime?",
