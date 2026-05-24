@@ -266,15 +266,26 @@ serve(async (req) => {
         twilio_sid: inboundSid,
       });
 
+      if (bodySuspicious || bodyTruncated) {
+        await supabase.from("admin_activity").insert({
+          event_type: "suspicious_sms",
+          actor_user_id: ownerUserId,
+          description: `Suspicious inbound SMS from ${fromNumber}${bodyTruncated ? " (truncated)" : ""}${bodySuspicious ? " (possible prompt injection)" : ""}`,
+          metadata: { lead_id: lead.id, from: fromNumber, truncated: bodyTruncated, suspicious: bodySuspicious, preview: body.slice(0, 200) },
+        }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+      }
+
       const leadUpdate: Record<string, unknown> = {};
-      if (["new", "contacted"].includes(lead.status)) {
-        leadUpdate.status = "responded";
+      const respondedNext = safeTransition(lead.status, "responded");
+      if (respondedNext !== lead.status) {
+        leadUpdate.status = respondedNext;
       }
       if (isUrgent) leadUpdate.urgency = "high";
       leadUpdate.next_follow_up_at = null;
       leadUpdate.follow_up_count = 0;
       if (Object.keys(leadUpdate).length > 0) {
         await supabase.from("leads").update(leadUpdate).eq("id", lead.id);
+        if (leadUpdate.status) lead.status = leadUpdate.status as string;
       }
     }
 
