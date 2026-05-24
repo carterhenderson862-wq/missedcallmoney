@@ -17,7 +17,7 @@ const SmsConsent = () => {
           SMS Consent &amp; Messaging Policy
         </h1>
         <p className="text-sm text-muted-foreground mb-12">
-          Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+          Last updated: 2026
         </p>
 
         <div className="space-y-10 text-base leading-relaxed">
