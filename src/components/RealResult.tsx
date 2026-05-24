@@ -4,6 +4,15 @@ const RealResult = () => {
   return (
     <section className="py-14 bg-secondary/80">
       <div className="max-w-3xl mx-auto px-6">
+        <div className="text-center mb-8">
+          <h2 className="font-display text-2xl md:text-3xl font-bold mb-2">
+            Here's what happens in real time
+          </h2>
+          <p className="text-muted-foreground text-sm max-w-lg mx-auto">
+            CallRecover turns a missed call into a qualified lead before you call back.
+          </p>
+        </div>
+
         {/* Latest call card */}
         <div className="bg-card rounded-xl p-6 mb-6 border border-border">
           <p className="text-muted-foreground text-xs uppercase tracking-wider mb-3 font-medium">Latest missed call</p>
