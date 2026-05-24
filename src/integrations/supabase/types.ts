@@ -214,6 +214,33 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_opt_outs: {
+        Row: {
+          created_at: string
+          id: string
+          opted_out_at: string
+          owner_user_id: string
+          phone_number: string
+          source_message: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          opted_out_at?: string
+          owner_user_id: string
+          phone_number: string
+          source_message?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          opted_out_at?: string
+          owner_user_id?: string
+          phone_number?: string
+          source_message?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
