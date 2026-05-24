@@ -92,6 +92,10 @@ function isHelpRequest(text: string): boolean {
   const t = (text || "").trim().toUpperCase();
   return t === "HELP" || t === "INFO";
 }
+function isOptIn(text: string): boolean {
+  const t = (text || "").trim().toUpperCase();
+  return t === "START" || t === "UNSTOP";
+}
 
 
 /**
@@ -218,6 +222,51 @@ serve(async (req) => {
     const isMissedCall = !body && (callStatus === "no-answer" || callStatus === "busy" || callStatus === "canceled" || !callStatus);
     const isInboundSms = !!body;
 
+    // Helper: check the persistent opt-out list for this (owner, phone).
+    const isPhoneOptedOut = async (phone: string): Promise<boolean> => {
+      const { data } = await supabase
+        .from("sms_opt_outs")
+        .select("id")
+        .eq("owner_user_id", ownerUserId)
+        .eq("phone_number", phone)
+        .maybeSingle();
+      return !!data;
+    };
+
+    // Handle inbound START (opt back in) BEFORE the global opt-out gate,
+    // otherwise an opted-out number could never re-subscribe.
+    if (isInboundSms && isOptIn(body)) {
+      await supabase
+        .from("sms_opt_outs")
+        .delete()
+        .eq("owner_user_id", ownerUserId)
+        .eq("phone_number", fromNumber);
+      await supabase.from("admin_activity").insert({
+        event_type: "sms_opt_in",
+        actor_user_id: ownerUserId,
+        description: `SMS opt-in (resubscribe) from ${fromNumber}`,
+        metadata: { from: fromNumber, keyword: body.trim().toUpperCase().slice(0, 20) },
+      }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+      // Twilio Messaging Service sends the carrier-standard opt-in confirmation.
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+    }
+
+    // Global opt-out gate: if this number is on the opt-out list and the inbound
+    // is NOT itself a STOP keyword (handled below), do not create a new lead,
+    // do not run AI, do not send any outbound SMS. Just acknowledge.
+    if (!(isInboundSms && isOptOut(body)) && await isPhoneOptedOut(fromNumber)) {
+      console.log(`Inbound from opted-out number ${fromNumber} — skipping automation`);
+      await supabase.from("admin_activity").insert({
+        event_type: "skipped_due_to_opt_out",
+        actor_user_id: ownerUserId,
+        description: `Inbound skipped — ${fromNumber} is on opt-out list`,
+        metadata: { from: fromNumber, channel: isMissedCall ? "missed_call" : "inbound_sms" },
+      }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+    }
+
     // Find or create lead scoped to this business
     const { data: existingLead } = await supabase
       .from("leads")
@@ -293,6 +342,18 @@ serve(async (req) => {
       // We additionally: stop all automation, mark open leads as "lost", log the event,
       // and short-circuit before any AI generation or outbound send.
       if (isOptOut(body)) {
+        // Persist to global opt-out list (idempotent via UNIQUE constraint).
+        await supabase
+          .from("sms_opt_outs")
+          .upsert(
+            {
+              owner_user_id: ownerUserId,
+              phone_number: fromNumber,
+              source_message: body.slice(0, 500),
+              opted_out_at: new Date().toISOString(),
+            },
+            { onConflict: "owner_user_id,phone_number" },
+          );
         await supabase
           .from("leads")
           .update({ status: "lost", next_follow_up_at: null, follow_up_count: 0 })

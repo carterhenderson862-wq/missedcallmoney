@@ -98,6 +98,28 @@ serve(async (req) => {
       const settings = await getSettings(lead.owner_user_id);
       const twilioFrom = settings?.twilio_phone_number as string | undefined;
 
+      // Global opt-out check — never message a phone number on the opt-out list.
+      const { data: optOut } = await supabase
+        .from("sms_opt_outs")
+        .select("id")
+        .eq("owner_user_id", lead.owner_user_id)
+        .eq("phone_number", lead.phone_number)
+        .maybeSingle();
+      if (optOut) {
+        await supabase.from("leads").update({
+          status: "lost",
+          next_follow_up_at: null,
+        }).eq("id", lead.id);
+        await supabase.from("admin_activity").insert({
+          event_type: "skipped_due_to_opt_out",
+          actor_user_id: lead.owner_user_id,
+          description: `Follow-up skipped — ${lead.phone_number} is on opt-out list`,
+          metadata: { lead_id: lead.id, from: lead.phone_number, channel: "follow_up" },
+        }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+        results.push({ leadId: lead.id, status: "skipped_opt_out" });
+        continue;
+      }
+
       if (!twilioFrom) {
         await supabase.from("messages").insert({
           owner_user_id: lead.owner_user_id,
