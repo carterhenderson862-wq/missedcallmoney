@@ -60,17 +60,26 @@ function sanitizeSmsBody(raw: string): { body: string; truncated: boolean; suspi
 }
 
 // Deterministic check: customer explicitly confirmed booking.
-// Requires an affirmative confirmation token (yes/confirm/book it/etc).
+// Requires an affirmative confirmation token AND no negation/deferral phrase.
+const BOOKING_NEGATIONS = [
+  /\bdo not\b/, /\bdon'?t\b/, /\bnot ready\b/, /\bnot now\b/, /\bnot yet\b/,
+  /\bno thanks?\b/, /\bnope\b/, /\bcan'?t\b/, /\bcannot\b/,
+  /\bmaybe\b/, /\blater\b/, /\bthink about\b/, /\bhold off\b/, /\bwait\b/,
+  /\bignore\b/, /\bcancel\b/, /\bnevermind\b/, /\bnever mind\b/,
+];
+const BOOKING_AFFIRMATIVES = [
+  /\byes\b/, /\byep\b/, /\byeah\b/, /\bsure\b/, /\bconfirm(ed)?\b/,
+  /\bbook it\b/, /\blet'?s do it\b/, /\bsounds good\b/, /\bworks\b/,
+  /\bperfect\b/, /\bgo ahead\b/, /\bdo it\b/,
+];
 function customerConfirmedBooking(text: string): boolean {
   const t = text.toLowerCase().trim();
   if (!t) return false;
-  const affirmatives = [
-    /\byes\b/, /\byep\b/, /\byeah\b/, /\bsure\b/, /\bconfirm(ed)?\b/,
-    /\bbook it\b/, /\blet'?s do it\b/, /\bsounds good\b/, /\bthat works\b/,
-    /\bok(ay)?\b/, /\bperfect\b/, /\bgo ahead\b/,
-  ];
-  return affirmatives.some((re) => re.test(t));
+  // Any negation/deferral phrase blocks confirmation, even if affirmatives are present.
+  if (BOOKING_NEGATIONS.some((re) => re.test(t))) return false;
+  return BOOKING_AFFIRMATIVES.some((re) => re.test(t));
 }
+export { customerConfirmedBooking, safeTransition, detectInjection, sanitizeSmsBody };
 
 /**
  * Validate Twilio webhook signature.
