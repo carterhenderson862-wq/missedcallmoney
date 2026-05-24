@@ -10,6 +10,68 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
 
+const MAX_SMS_BODY_LEN = 1600;
+
+const ALLOWED_STATUSES = ["new", "responded", "qualifying", "booking", "booked", "no_response", "lost"] as const;
+type LeadStatus = typeof ALLOWED_STATUSES[number];
+
+const ALLOWED_TRANSITIONS: Record<string, LeadStatus[]> = {
+  new: ["responded", "qualifying", "no_response", "lost"],
+  contacted: ["responded", "qualifying", "no_response", "lost"], // legacy
+  responded: ["qualifying", "booking", "no_response", "lost"],
+  qualifying: ["booking", "responded", "no_response", "lost"],
+  booking: ["booked", "qualifying", "no_response", "lost"],
+  booked: [],
+  no_response: ["responded", "qualifying"],
+  lost: [],
+};
+
+function safeTransition(current: string, next: string): string {
+  if (!ALLOWED_STATUSES.includes(next as LeadStatus)) return current;
+  if (current === next) return current;
+  const allowed = ALLOWED_TRANSITIONS[current] || [];
+  return allowed.includes(next as LeadStatus) ? next : current;
+}
+
+const INJECTION_PATTERNS = [
+  /ignore (all |previous |above )?(prior |previous )?instructions?/i,
+  /disregard (all |previous |the )?(prior |previous )?(instructions?|prompt)/i,
+  /you are now (an? )?(admin|administrator|system|developer)/i,
+  /reveal (your |the )?(system )?prompt/i,
+  /show (me )?(your |the )?(system )?prompt/i,
+  /system prompt/i,
+  /act as (an? )?(admin|system|developer)/i,
+  /set status to/i,
+  /mark (this |the |as )?(lead )?(as )?booked/i,
+  /update (the )?database/i,
+  /\bready_to_book\b/i,
+  /\bbooked_at\b/i,
+  /override (the )?(system|rules|instructions)/i,
+];
+
+function detectInjection(text: string): boolean {
+  return INJECTION_PATTERNS.some((re) => re.test(text));
+}
+
+function sanitizeSmsBody(raw: string): { body: string; truncated: boolean; suspicious: boolean } {
+  const truncated = raw.length > MAX_SMS_BODY_LEN;
+  const body = truncated ? raw.slice(0, MAX_SMS_BODY_LEN) : raw;
+  return { body, truncated, suspicious: detectInjection(body) };
+}
+
+// Deterministic check: customer explicitly confirmed booking.
+// Requires an affirmative confirmation token (yes/confirm/book it/etc).
+function customerConfirmedBooking(text: string): boolean {
+  const t = text.toLowerCase().trim();
+  if (!t) return false;
+  const affirmatives = [
+    /\byes\b/, /\byep\b/, /\byeah\b/, /\bsure\b/, /\bconfirm(ed)?\b/,
+    /\bbook it\b/, /\blet'?s do it\b/, /\bsounds good\b/, /\bthat works\b/,
+    /\bok(ay)?\b/, /\bperfect\b/, /\bgo ahead\b/,
+  ];
+  return affirmatives.some((re) => re.test(t));
+}
+
 /**
  * Validate Twilio webhook signature.
  * Algorithm: HMAC-SHA1 of (URL + sorted concatenation of POST params), base64.
