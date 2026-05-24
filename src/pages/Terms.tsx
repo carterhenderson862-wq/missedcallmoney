@@ -26,9 +26,11 @@ const Terms = () => {
               Service description
             </h2>
             <p className="text-muted-foreground">
-              Our service automatically responds to missed calls on behalf of local service businesses by
-              sending SMS text messages to callers. The system qualifies leads, answers basic questions, and
-              helps schedule jobs through automated text conversations, with results visible in your
+              <span className="font-semibold text-foreground">CallRecover</span> is a missed-call
+              recovery and SMS scheduling assistance service for local service businesses. The
+              service automatically responds to missed calls on behalf of the business by sending
+              SMS text messages to callers. It qualifies leads, answers basic questions, and helps
+              schedule jobs through automated text conversations, with results visible in your
               dashboard.
             </p>
           </section>
@@ -68,11 +70,24 @@ const Terms = () => {
 
           <section>
             <h2 className="font-display text-2xl font-semibold mb-3">
-              Billing &amp; cancellation
+              Pricing, billing &amp; cancellation
+            </h2>
+            <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
+              <li>7-day free trial — no card required to start.</li>
+              <li>After the trial, the service is <span className="font-semibold text-foreground">$249/month</span>, billed monthly.</li>
+              <li>No contracts. Cancel anytime; cancellation stops future charges and ends service at the end of the current billing period.</li>
+              <li>No setup fees.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="font-display text-2xl font-semibold mb-3">
+              Call forwarding &amp; customer disclosure
             </h2>
             <p className="text-muted-foreground">
-              After your free trial, the service is billed monthly. You may cancel at any time; cancellation
-              stops future charges and ends service at the end of the current billing period.
+              Businesses using CallRecover are responsible for ensuring their customers understand
+              that missed-call follow-up may be handled by CallRecover-powered SMS automation and
+              that messages may be stored in the business dashboard for service follow-up.
             </p>
           </section>
 

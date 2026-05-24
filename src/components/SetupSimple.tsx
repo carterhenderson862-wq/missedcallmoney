@@ -16,7 +16,7 @@ const SetupSimple = () => {
             What you do on <span className="text-gradient">day 1</span>
           </h2>
           <p className="text-sm text-muted-foreground mt-3 max-w-xl mx-auto">
-            Set it up once. Then every missed call gets handled automatically.
+            Set it up once. Then missed calls get a fast SMS reply automatically.
           </p>
         </div>
 

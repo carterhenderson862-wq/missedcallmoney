@@ -26,12 +26,15 @@ const Privacy = () => {
               What data we collect
             </h2>
             <p className="text-muted-foreground">
-              We collect only the information needed to respond to missed calls on your behalf:
+              We collect only the information needed to provide the service:
             </p>
             <ul className="list-disc pl-6 mt-3 space-y-2 text-muted-foreground">
+              <li>Customer name (when provided)</li>
               <li>Phone numbers of callers and customers</li>
-              <li>SMS messages exchanged between you, your customers, and our system</li>
-              <li>Basic job details shared during the conversation (e.g. service type, location, urgency)</li>
+              <li>Business details supplied by you (business name, service area, services, hours, pricing)</li>
+              <li>SMS message content exchanged between you, your customers, and our system</li>
+              <li>Service request details (e.g. service type, location, urgency)</li>
+              <li>Appointment preferences and scheduling information</li>
             </ul>
           </section>
 
@@ -40,9 +43,9 @@ const Privacy = () => {
               How we use your data
             </h2>
             <p className="text-muted-foreground">
-              Your data is used solely to provide the service: sending automated text replies to missed calls,
-              qualifying leads, booking jobs, and displaying conversations in your dashboard. We do not use your
-              data for advertising or profiling.
+              Your data is used solely to provide the service: service communication, scheduling,
+              missed-call lead recovery, appointment confirmation and follow-up, customer support,
+              and ongoing product operation. We do not use your data for advertising or profiling.
             </p>
           </section>
 
@@ -51,10 +54,23 @@ const Privacy = () => {
               We do not sell or share your data
             </h2>
             <p className="text-muted-foreground">
-              We never sell, rent, or share your data or your customers' data with third parties for marketing
-              purposes. The only third-party services involved are the infrastructure providers required to
-              deliver SMS messages (e.g. our messaging and hosting providers), and they only process data on
-              our behalf.
+              Mobile information (including phone numbers and SMS content) is never sold, rented,
+              or shared with third parties for marketing or promotional purposes. The only
+              third-party services involved are the infrastructure providers required to deliver
+              SMS messages and host the application (e.g. our messaging and cloud providers), and
+              they only process data on our behalf.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-2xl font-semibold mb-3">
+              Data security
+            </h2>
+            <p className="text-muted-foreground">
+              Data is stored on secured cloud infrastructure with row-level access controls so
+              each business can only access its own leads, messages, and settings. Access keys
+              and credentials are kept in server-side secret storage and are not exposed to the
+              browser.
             </p>
           </section>
 

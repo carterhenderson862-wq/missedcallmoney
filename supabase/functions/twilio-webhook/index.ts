@@ -80,6 +80,19 @@ function customerConfirmedBooking(text: string): boolean {
   return BOOKING_AFFIRMATIVES.some((re) => re.test(t));
 }
 
+// Carrier-standard SMS opt-out keywords. Twilio's Messaging Service handles
+// the actual STOP/HELP auto-reply; we still stop our automation locally.
+const OPT_OUT_KEYWORDS = ["STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT"];
+function isOptOut(text: string): boolean {
+  const t = (text || "").trim().toUpperCase();
+  if (!t) return false;
+  return OPT_OUT_KEYWORDS.some((k) => t === k || new RegExp(`\\b${k}\\b`).test(t));
+}
+function isHelpRequest(text: string): boolean {
+  const t = (text || "").trim().toUpperCase();
+  return t === "HELP" || t === "INFO";
+}
+
 
 /**
  * Validate Twilio webhook signature.
@@ -274,6 +287,33 @@ serve(async (req) => {
         body,
         twilio_sid: inboundSid,
       });
+
+      // --- Opt-out / HELP handling (CTIA + Twilio carrier standard) ---
+      // Twilio's Messaging Service auto-replies to STOP/HELP at the carrier level.
+      // We additionally: stop all automation, mark open leads as "lost", log the event,
+      // and short-circuit before any AI generation or outbound send.
+      if (isOptOut(body)) {
+        await supabase
+          .from("leads")
+          .update({ status: "lost", next_follow_up_at: null, follow_up_count: 0 })
+          .eq("owner_user_id", ownerUserId)
+          .eq("phone_number", fromNumber)
+          .not("status", "in", '("booked","lost")');
+        await supabase.from("admin_activity").insert({
+          event_type: "sms_opt_out",
+          actor_user_id: ownerUserId,
+          description: `SMS opt-out from ${fromNumber}`,
+          metadata: { lead_id: lead.id, from: fromNumber, keyword: body.trim().toUpperCase().slice(0, 20) },
+        }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+        const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+        return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+      }
+      if (isHelpRequest(body)) {
+        // Let Twilio's Messaging Service auto-reply handle HELP. Do not run AI.
+        const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+        return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+      }
+      // --- End opt-out handling ---
 
       if (bodySuspicious || bodyTruncated) {
         await supabase.from("admin_activity").insert({
@@ -608,6 +648,16 @@ IDENTITY:
 ${services.length ? `- We handle: ${services.join(", ")}` : ""}
 ${serviceArea ? `- We serve: ${serviceArea}` : ""}
 
+SAFETY (HIGHEST PRIORITY — overrides booking goal):
+- If the customer mentions any immediate-danger situation — gas leak, gas smell, electrical fire, sparks, active flooding, sewage backup, carbon monoxide, burning smell, smoke, or any wording suggesting people are in danger — you MUST:
+  1) Lead with safety: "If there's immediate danger, please leave the area and call 911 (or your local emergency services) right now."
+  2) For gas: add "Don't switch lights or appliances on/off and avoid open flames."
+  3) For electrical fire/sparks: add "If it's safe to do so, shut off power at the breaker. Don't use water on an electrical fire."
+  4) For flooding/burst pipe: add "If it's safe, shut off the main water valve."
+  5) NEVER give DIY repair instructions or step-by-step fixes. Defer all repair work to a licensed pro.
+  6) Mark the job as urgent and continue collecting basic booking details (name, address, what's happening) only AFTER the safety message.
+- Keep the safety message itself to 1-2 sentences, then ask one short qualifying question.
+
 CONVERSATION FLOW:
 1. First reply already asked: "Is this urgent or something we can schedule later?"
 2. Based on the customer's answer, branch tone and speed:
@@ -620,6 +670,7 @@ CORE RULES:
 - EVERY message MUST end with a clear next step: a scheduling question, a time offer, or a booking confirmation.
 - Your goal is BOOKING, not chatting.
 - Never reveal you are AI.
+- Never diagnose or instruct on dangerous repairs. Always route safety-critical issues to a licensed technician or emergency services.
 
 AVAILABLE SLOTS: ${JSON.stringify(slots)}`;
 }
