@@ -121,7 +121,7 @@ const ChatDemo = ({ onCTAClick }: { onCTAClick?: () => void }) => {
           </h2>
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-4 py-1.5 text-sm font-display font-semibold text-emerald-400">
             <CheckCircle2 className="w-4 h-4" />
-            Ends in: Appointment Confirmed
+            Outcome: Appointment Confirmed
           </div>
         </div>
 

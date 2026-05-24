@@ -16,6 +16,9 @@ const TrustFooter = () => {
             support@callrecover.com
           </a>
         </p>
+        <p className="text-sm text-muted-foreground/70 font-medium">
+          Turning missed calls into booked jobs for local service businesses.
+        </p>
         <p className="text-sm flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <Link
             to="/privacy"
