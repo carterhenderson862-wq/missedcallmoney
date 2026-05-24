@@ -92,6 +92,10 @@ function isHelpRequest(text: string): boolean {
   const t = (text || "").trim().toUpperCase();
   return t === "HELP" || t === "INFO";
 }
+function isOptIn(text: string): boolean {
+  const t = (text || "").trim().toUpperCase();
+  return t === "START" || t === "UNSTOP";
+}
 
 
 /**
