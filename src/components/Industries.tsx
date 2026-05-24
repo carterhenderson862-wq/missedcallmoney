@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { Wrench, Flame, HomeIcon, Zap } from "lucide-react";
 
 const industries = [
-  { icon: Wrench, name: "Plumbing", description: "Emergency calls are your bread & butter. Never miss one again." },
+  { icon: Wrench, name: "Plumbing", description: "Emergency calls are your bread & butter — fewer should go to voicemail." },
   { icon: Flame, name: "HVAC", description: "Seasonal demand spikes? Your AI agent scales instantly." },
-  { icon: HomeIcon, name: "Roofing", description: "High-ticket jobs lost to voicemail. Not anymore." },
-  { icon: Zap, name: "Electrical", description: "Every missed call is a $300–$2,000 job walking away." },
+  { icon: HomeIcon, name: "Roofing", description: "High-ticket jobs lost to voicemail. Help recover the ones you can." },
+  { icon: Zap, name: "Electrical", description: "Each missed call can be a $300–$2,000 job worth recovering." },
 ];
 
 const Industries = () => {
