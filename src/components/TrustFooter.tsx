@@ -16,7 +16,7 @@ const TrustFooter = () => {
             support@callrecover.com
           </a>
         </p>
-        <p className="text-sm flex items-center justify-center gap-4">
+        <p className="text-sm flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
           <Link
             to="/privacy"
             className="text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
@@ -29,6 +29,13 @@ const TrustFooter = () => {
             className="text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
           >
             Terms
+          </Link>
+          <span className="text-muted-foreground/50">·</span>
+          <Link
+            to="/sms-consent"
+            className="text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+          >
+            SMS Consent
           </Link>
         </p>
       </div>
