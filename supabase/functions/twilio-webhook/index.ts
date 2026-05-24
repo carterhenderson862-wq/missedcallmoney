@@ -288,6 +288,33 @@ serve(async (req) => {
         twilio_sid: inboundSid,
       });
 
+      // --- Opt-out / HELP handling (CTIA + Twilio carrier standard) ---
+      // Twilio's Messaging Service auto-replies to STOP/HELP at the carrier level.
+      // We additionally: stop all automation, mark open leads as "lost", log the event,
+      // and short-circuit before any AI generation or outbound send.
+      if (isOptOut(body)) {
+        await supabase
+          .from("leads")
+          .update({ status: "lost", next_follow_up_at: null, follow_up_count: 0 })
+          .eq("owner_user_id", ownerUserId)
+          .eq("phone_number", fromNumber)
+          .not("status", "in", '("booked","lost")');
+        await supabase.from("admin_activity").insert({
+          event_type: "sms_opt_out",
+          actor_user_id: ownerUserId,
+          description: `SMS opt-out from ${fromNumber}`,
+          metadata: { lead_id: lead.id, from: fromNumber, keyword: body.trim().toUpperCase().slice(0, 20) },
+        }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+        const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+        return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+      }
+      if (isHelpRequest(body)) {
+        // Let Twilio's Messaging Service auto-reply handle HELP. Do not run AI.
+        const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+        return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+      }
+      // --- End opt-out handling ---
+
       if (bodySuspicious || bodyTruncated) {
         await supabase.from("admin_activity").insert({
           event_type: "suspicious_sms",
