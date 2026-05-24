@@ -162,7 +162,9 @@ serve(async (req) => {
 
     const fromNumber = params["From"] || "";
     const toNumber = params["To"] || "";
-    const body = params["Body"] || "";
+    const rawBodyText = params["Body"] || "";
+    const { body: sanitizedBody, truncated: bodyTruncated, suspicious: bodySuspicious } = sanitizeSmsBody(rawBodyText);
+    const body = sanitizedBody;
     const callStatus = params["CallStatus"] || null;
 
     if (!fromNumber || !toNumber) {
