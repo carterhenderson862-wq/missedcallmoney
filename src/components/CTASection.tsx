@@ -6,7 +6,7 @@ const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
     <section id="cta" className="py-[60px]">
       <div className="container">
         <div
-          className="relative rounded-3xl bg-card p-12 md:p-20 text-center overflow-hidden"
+          className="relative rounded-3xl bg-card p-6 sm:p-12 md:p-20 text-center overflow-hidden"
           style={{ border: "1px solid hsl(var(--primary) / 0.3)" }}
         >
           <div className="relative z-10">
@@ -14,13 +14,13 @@ const CTASection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
               Stop losing jobs from{" "}
               <span className="text-gradient">missed calls.</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-lg mx-auto mb-10">
+            <p className="text-muted-foreground text-base sm:text-lg max-w-lg mx-auto mb-10">
               Let it work on your next missed call.
             </p>
             <Button
               size="lg"
               onClick={onCTAClick}
-              className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-10 py-6 shadow-glow hover:opacity-90 transition-opacity"
+              className="bg-gradient-primary text-primary-foreground font-display font-semibold text-base px-6 sm:px-10 py-6 shadow-glow hover:opacity-90 transition-opacity w-full sm:w-auto"
             >
               Start your 7-day free trial
               <ArrowRight className="w-4 h-4 ml-2" />
