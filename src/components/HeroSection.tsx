@@ -11,12 +11,13 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
         <img
           src={heroBg}
           alt=""
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover scale-110 blur-md"
           fetchPriority="high"
           loading="eager"
           decoding="async"
         />
         <div className="absolute inset-0 bg-background/85" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background" />
         <div className="absolute inset-0 bg-gradient-glow" />
       </div>
 
