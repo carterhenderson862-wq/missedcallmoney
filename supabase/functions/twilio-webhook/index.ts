@@ -424,7 +424,6 @@ serve(async (req) => {
     const twilioFrom = settings?.twilio_phone_number;
 
     if (isMissedCall) {
-      const bizName = settings?.business_name || "us";
       const replyText = `Hey—sorry we missed your call. What's going on, is this something urgent?`;
 
       if (!twilioFrom) {
