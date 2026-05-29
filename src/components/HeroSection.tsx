@@ -16,8 +16,8 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
           loading="eager"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-background/85" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/70 to-background" />
+        <div className="absolute inset-0 bg-background/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background/50" />
         <div className="absolute inset-0 bg-gradient-glow" />
       </div>
 
