@@ -11,7 +11,7 @@ const HeroSection = ({ onCTAClick }: { onCTAClick?: () => void }) => {
         <img
           src={heroBg}
           alt=""
-          className="w-full h-full object-cover scale-110 blur-md"
+          className="w-full h-full object-cover scale-110 blur-[2px]"
           fetchPriority="high"
           loading="eager"
           decoding="async"
