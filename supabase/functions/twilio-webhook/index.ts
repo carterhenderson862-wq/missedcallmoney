@@ -424,7 +424,6 @@ serve(async (req) => {
     const twilioFrom = settings?.twilio_phone_number;
 
     if (isMissedCall) {
-      const bizName = settings?.business_name || "us";
       const replyText = `Hey—sorry we missed your call. What's going on, is this something urgent?`;
 
       if (!twilioFrom) {
@@ -743,21 +742,4 @@ CORE RULES:
 - Never diagnose or instruct on dangerous repairs. Always route safety-critical issues to a licensed technician or emergency services.
 
 AVAILABLE SLOTS: ${JSON.stringify(slots)}`;
-}
-
-function determineStatus(aiReply: string, inboundMsg: string, currentStatus: string): string {
-  const reply = aiReply.toLowerCase();
-  const inbound = inboundMsg.toLowerCase();
-
-  const confirmWords = ["yes", "yeah", "yep", "sure", "sounds good", "let's do it", "book it", "perfect", "that works", "confirm"];
-  if (currentStatus === "booking" && confirmWords.some(w => inbound.includes(w))) return "booked";
-
-  if (reply.includes("schedule") || reply.includes("time slot") || reply.includes("available") || reply.includes("tomorrow") || reply.includes("today") || reply.includes("lock that in") || reply.includes("squeeze you in")) {
-    return "booking";
-  }
-  if (reply.includes("booked") || reply.includes("confirmed") || reply.includes("see you") || reply.includes("all set")) {
-    return "booked";
-  }
-  if (reply.includes("?")) return "qualifying";
-  return currentStatus;
 }
