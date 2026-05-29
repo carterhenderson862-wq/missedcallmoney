@@ -219,8 +219,17 @@ serve(async (req) => {
 
     const ownerUserId = settings.owner_user_id;
 
-    const isMissedCall = !body && (callStatus === "no-answer" || callStatus === "busy" || callStatus === "canceled" || !callStatus);
+    // Require an explicit voice CallStatus to treat as a missed call. Without this,
+    // any unrelated Twilio POST (e.g. message status callback misrouted here) would
+    // create phantom leads from the recipient/Twilio number.
+    const isMissedCall = !body && (callStatus === "no-answer" || callStatus === "busy" || callStatus === "canceled" || callStatus === "failed");
     const isInboundSms = !!body;
+
+    // If neither a missed call nor an inbound SMS, ack and exit — don't create a lead.
+    if (!isMissedCall && !isInboundSms) {
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+    }
 
     // Helper: check the persistent opt-out list for this (owner, phone).
     const isPhoneOptedOut = async (phone: string): Promise<boolean> => {
