@@ -15,6 +15,7 @@ const Settings = lazy(() => import("./pages/Settings.tsx"));
 const Privacy = lazy(() => import("./pages/Privacy.tsx"));
 const Terms = lazy(() => import("./pages/Terms.tsx"));
 const SmsConsent = lazy(() => import("./pages/SmsConsent.tsx"));
+const SmsOptInFlow = lazy(() => import("./pages/SmsOptInFlow.tsx"));
 const Admin = lazy(() => import("./pages/Admin.tsx"));
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/sms-consent" element={<SmsConsent />} />
+            <Route path="/sms-opt-in-flow" element={<SmsOptInFlow />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
