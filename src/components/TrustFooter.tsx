@@ -40,6 +40,13 @@ const TrustFooter = () => {
           >
             SMS Consent
           </Link>
+          <span className="text-muted-foreground/50">·</span>
+          <Link
+            to="/sms-opt-in-flow"
+            className="text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+          >
+            SMS Opt-In Flow
+          </Link>
         </p>
       </div>
     </footer>
