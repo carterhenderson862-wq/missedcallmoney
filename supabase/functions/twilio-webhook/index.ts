@@ -638,12 +638,30 @@ serve(async (req) => {
         status: "sent",
       });
 
-      console.log("sms_sent", { lead_id: lead.id, call_sid: callSid, to: fromNumber, sid: smsData.sid });
+      console.log("sms_sent", {
+        lead_id: lead.id,
+        call_sid: callSid,
+        to: fromNumber,
+        from: TWILIO_MESSAGING_SERVICE_SID || twilioFrom,
+        sid: smsData.sid,
+        twilio_status: smsData.status,
+        error_code: smsData.error_code,
+        error_message: smsData.error_message,
+      });
       await supabase.from("admin_activity").insert({
         event_type: "sms_sent",
         actor_user_id: ownerUserId,
-        description: `Missed-call SMS sent to ${fromNumber}`,
-        metadata: { lead_id: lead.id, call_sid: callSid, to: fromNumber, sid: smsData.sid },
+        description: `Missed-call SMS queued to ${fromNumber} (Twilio status: ${smsData.status || "unknown"})`,
+        metadata: {
+          lead_id: lead.id,
+          call_sid: callSid,
+          to: fromNumber,
+          from: TWILIO_MESSAGING_SERVICE_SID || twilioFrom,
+          sid: smsData.sid,
+          twilio_status: smsData.status,
+          error_code: smsData.error_code,
+          error_message: smsData.error_message,
+        },
       }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
 
       const updateData: Record<string, unknown> = { status: "contacted", follow_up_count: 0 };
