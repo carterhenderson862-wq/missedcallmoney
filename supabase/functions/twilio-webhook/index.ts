@@ -197,15 +197,41 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const TWILIO_API_KEY = Deno.env.get("TWILIO_API_KEY");
     const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
+    const TWILIO_MESSAGING_SERVICE_SID = Deno.env.get("TWILIO_MESSAGING_SERVICE_SID") || "";
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!LOVABLE_API_KEY || !TWILIO_API_KEY || !TWILIO_AUTH_TOKEN || !supabaseUrl || !supabaseKey) {
-      console.error("Missing required environment variables");
+      console.error("missing_twilio_credentials", {
+        has_lovable_key: !!LOVABLE_API_KEY,
+        has_twilio_key: !!TWILIO_API_KEY,
+        has_twilio_auth: !!TWILIO_AUTH_TOKEN,
+      });
       return failSafe(500, { error: "Server misconfigured" });
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // --- Twilio Message status callback (delivery receipts) ---
+    // Twilio POSTs MessageStatus updates (queued/sent/delivered/failed/undelivered)
+    // back to this same webhook URL when we pass StatusCallback. These have
+    // MessageSid + MessageStatus but no Body and no CallSid. Log them so we
+    // can see actual carrier delivery state, then ack with empty TwiML.
+    if (!params["CallSid"] && params["MessageSid"] && params["MessageStatus"] && !params["Body"]) {
+      const ms = params["MessageStatus"];
+      const sid = params["MessageSid"];
+      const errCode = params["ErrorCode"] || null;
+      console.log("sms_status_callback", { sid, status: ms, error_code: errCode, to: params["To"] || null });
+      if (ms === "failed" || ms === "undelivered") {
+        await supabase.from("admin_activity").insert({
+          event_type: "sms_send_failed",
+          actor_user_id: null,
+          description: `Carrier reported SMS ${ms} for ${sid}`,
+          metadata: { sid, status: ms, error_code: errCode, to: params["To"] || null },
+        }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+      }
+      return new Response(EMPTY_TWIML, { headers: { ...corsHeaders, "Content-Type": "text/xml; charset=utf-8" } });
+    }
 
     // --- Twilio signature validation ---
     const contentType = req.headers.get("content-type") || "";
