@@ -482,8 +482,7 @@ serve(async (req) => {
       }
       await supabase.from("leads").update(updateData).eq("id", lead.id);
 
-      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
-      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+      return twimlResponse(isVoiceRequest ? MISSED_TWIML : EMPTY_TWIML);
     }
 
     // Inbound SMS — generate AI response
