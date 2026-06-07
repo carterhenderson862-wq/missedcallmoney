@@ -136,6 +136,21 @@ const Settings = () => {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="twilioPhone">CallRecover phone number</Label>
+            <Input
+              id="twilioPhone"
+              placeholder="+17372711871"
+              value={twilioPhone}
+              onChange={(e) => setTwilioPhone(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Enter the Twilio number assigned to this business. Use E.164 format, like +17372711871.
+            </p>
+          </div>
+
+
+
+          <div className="space-y-2">
             <Label htmlFor="demoAgentLabel">Chat Demo Header Label (optional)</Label>
             <Input
               id="demoAgentLabel"
