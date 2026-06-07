@@ -543,7 +543,14 @@ serve(async (req) => {
         }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
       }
 
-      if (!twilioFrom) {
+      if (!twilioFrom && !TWILIO_MESSAGING_SERVICE_SID) {
+        console.error("missing_from_number", { lead_id: lead.id, call_sid: callSid });
+        await supabase.from("admin_activity").insert({
+          event_type: "sms_send_failed",
+          actor_user_id: ownerUserId,
+          description: `Missed-call SMS skipped — no Twilio From number or Messaging Service SID configured`,
+          metadata: { lead_id: lead.id, call_sid: callSid, reason: "missing_from_number" },
+        }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
         await supabase.from("messages").insert({
           owner_user_id: ownerUserId,
           lead_id: lead.id,
@@ -558,6 +565,25 @@ serve(async (req) => {
         );
       }
 
+      // Build StatusCallback URL so Twilio reports delivery status back here.
+      const statusCallbackUrl =
+        (Deno.env.get("SUPABASE_URL") || "").replace(/\/+$/, "") + "/functions/v1/twilio-webhook";
+
+      const smsParams = new URLSearchParams({ To: fromNumber, Body: replyText });
+      if (TWILIO_MESSAGING_SERVICE_SID) {
+        smsParams.set("MessagingServiceSid", TWILIO_MESSAGING_SERVICE_SID);
+      } else {
+        smsParams.set("From", twilioFrom!);
+      }
+      if (statusCallbackUrl) smsParams.set("StatusCallback", statusCallbackUrl);
+
+      console.log("sms_send_attempted", {
+        lead_id: lead.id,
+        call_sid: callSid,
+        to: fromNumber,
+        from: TWILIO_MESSAGING_SERVICE_SID ? `MessagingService:${TWILIO_MESSAGING_SERVICE_SID}` : twilioFrom,
+      });
+
       const smsResponse = await fetch(`${GATEWAY_URL}/Messages.json`, {
         method: "POST",
         headers: {
@@ -565,17 +591,41 @@ serve(async (req) => {
           "X-Connection-Api-Key": TWILIO_API_KEY,
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: new URLSearchParams({ To: fromNumber, From: twilioFrom, Body: replyText }),
+        body: smsParams,
       });
       const smsData = await smsResponse.json().catch(() => ({}));
       if (!smsResponse.ok) {
-        console.error("sms_send_failed", { status: smsResponse.status, data: smsData, call_sid: callSid });
+        console.error("sms_send_failed", {
+          status: smsResponse.status,
+          twilio_code: smsData?.code,
+          twilio_message: smsData?.message,
+          more_info: smsData?.more_info,
+          call_sid: callSid,
+          to: fromNumber,
+          from: TWILIO_MESSAGING_SERVICE_SID || twilioFrom,
+        });
         await supabase.from("admin_activity").insert({
           event_type: "sms_send_failed",
           actor_user_id: ownerUserId,
-          description: `Missed-call SMS failed to ${fromNumber}`,
-          metadata: { lead_id: lead.id, call_sid: callSid, status: smsResponse.status, error: smsData },
+          description: `Missed-call SMS failed to ${fromNumber} (Twilio ${smsData?.code || smsResponse.status})`,
+          metadata: {
+            lead_id: lead.id,
+            call_sid: callSid,
+            http_status: smsResponse.status,
+            twilio_code: smsData?.code,
+            twilio_message: smsData?.message,
+            more_info: smsData?.more_info,
+            to: fromNumber,
+            from: TWILIO_MESSAGING_SERVICE_SID || twilioFrom,
+          },
         }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+        await supabase.from("messages").insert({
+          owner_user_id: ownerUserId,
+          lead_id: lead.id,
+          direction: "outbound",
+          body: replyText,
+          status: "failed",
+        });
         return twimlResponse(isVoiceRequest ? MISSED_TWIML : EMPTY_TWIML);
       }
 
