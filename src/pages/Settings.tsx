@@ -12,6 +12,8 @@ import { Save, Plus, X } from "lucide-react";
 
 const Settings = () => {
   const { data: settings, isLoading } = useSettings();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [businessName, setBusinessName] = useState("");
   const [serviceArea, setServiceArea] = useState("");
   const [services, setServices] = useState<string[]>([]);
