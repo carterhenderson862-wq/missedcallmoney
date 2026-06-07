@@ -124,10 +124,45 @@ function validateTwilioSignature(
   return mismatch === 0;
 }
 
+const EMPTY_TWIML = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
+const MISSED_TWIML = `<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Sorry we missed your call. We will text you shortly.</Say></Response>`;
+
+function twimlResponse(xml: string = EMPTY_TWIML, status = 200) {
+  return new Response(xml, {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "text/xml; charset=utf-8" },
+  });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  // Parse the body first so we can detect a Twilio voice request as early as
+  // possible. Any error path in the voice branch MUST return valid TwiML
+  // (text/xml) instead of JSON — otherwise Twilio plays "an application
+  // error has occurred" to the caller.
+  let rawBody = "";
+  const params: Record<string, string> = {};
+  try {
+    rawBody = await req.text();
+    const fd = new URLSearchParams(rawBody);
+    for (const [k, v] of fd.entries()) params[k] = v;
+  } catch (_e) {
+    // ignore — handled by downstream checks
+  }
+  const isVoiceRequest = !!params["CallSid"];
+  const ua = req.headers.get("user-agent") || "";
+  const looksLikeTwilio = isVoiceRequest || ua.includes("TwilioProxy");
+
+  const failSafe = (status: number, jsonBody: Record<string, unknown>) => {
+    if (isVoiceRequest) return twimlResponse(EMPTY_TWIML, 200);
+    return new Response(JSON.stringify(jsonBody), {
+      status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  };
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -138,10 +173,7 @@ serve(async (req) => {
 
     if (!LOVABLE_API_KEY || !TWILIO_API_KEY || !TWILIO_AUTH_TOKEN || !supabaseUrl || !supabaseKey) {
       console.error("Missing required environment variables");
-      return new Response(JSON.stringify({ error: "Server misconfigured" }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return failSafe(500, { error: "Server misconfigured" });
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -150,25 +182,14 @@ serve(async (req) => {
     const contentType = req.headers.get("content-type") || "";
     if (!contentType.includes("application/x-www-form-urlencoded")) {
       console.warn("Rejected non-form-encoded request");
-      return new Response(JSON.stringify({ error: "Invalid content type" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return failSafe(400, { error: "Invalid content type" });
     }
 
     const signature = req.headers.get("x-twilio-signature");
     if (!signature) {
       console.warn("Rejected request: missing X-Twilio-Signature");
-      return new Response(JSON.stringify({ error: "Forbidden" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return failSafe(403, { error: "Forbidden" });
     }
-
-    const rawBody = await req.text();
-    const formData = new URLSearchParams(rawBody);
-    const params: Record<string, string> = {};
-    for (const [k, v] of formData.entries()) params[k] = v;
 
     // Twilio signs against the webhook URL it called. Honor x-forwarded-proto/host if present.
     const proto = req.headers.get("x-forwarded-proto") || "https";
@@ -179,10 +200,7 @@ serve(async (req) => {
     const valid = validateTwilioSignature(TWILIO_AUTH_TOKEN, webhookUrl, params, signature);
     if (!valid) {
       console.warn("Rejected request: invalid Twilio signature");
-      return new Response(JSON.stringify({ error: "Forbidden" }), {
-        status: 403,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return failSafe(403, { error: "Forbidden" });
     }
     // --- End signature validation ---
 
@@ -194,10 +212,7 @@ serve(async (req) => {
     const callStatus = params["CallStatus"] || null;
 
     if (!fromNumber || !toNumber) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return failSafe(400, { error: "Missing required fields" });
     }
 
     // Route to the correct business by the Twilio number that was called
@@ -211,24 +226,23 @@ serve(async (req) => {
     if (!settings) {
       console.warn(`No business found for Twilio number ${toNumber}`);
       // Return 200 so Twilio doesn't retry; this isn't an error worth retrying.
-      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
-      return new Response(twiml, {
-        headers: { ...corsHeaders, "Content-Type": "application/xml" },
-      });
+      // For voice, still return valid empty TwiML (not JSON).
+      return twimlResponse(isVoiceRequest ? MISSED_TWIML : EMPTY_TWIML);
     }
 
     const ownerUserId = settings.owner_user_id;
 
-    // Require an explicit voice CallStatus to treat as a missed call. Without this,
-    // any unrelated Twilio POST (e.g. message status callback misrouted here) would
-    // create phantom leads from the recipient/Twilio number.
-    const isMissedCall = !body && (callStatus === "no-answer" || callStatus === "busy" || callStatus === "canceled" || callStatus === "failed");
+    // A Twilio voice webhook fires on every inbound call. Since this app
+    // does not answer calls, every inbound voice request is effectively a
+    // missed call we want to follow up via SMS. We also still recognize
+    // explicit status-callback values for completeness.
+    const isStatusMissed = callStatus === "no-answer" || callStatus === "busy" || callStatus === "canceled" || callStatus === "failed";
+    const isMissedCall = !body && (isVoiceRequest || isStatusMissed);
     const isInboundSms = !!body;
 
-    // If neither a missed call nor an inbound SMS, ack and exit — don't create a lead.
+    // If neither a voice call nor an inbound SMS, ack and exit — don't create a lead.
     if (!isMissedCall && !isInboundSms) {
-      const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
-      return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+      return twimlResponse();
     }
 
     // Helper: check the persistent opt-out list for this (owner, phone).
