@@ -79,12 +79,16 @@ const Settings = () => {
         services,
         twilio_phone_number: normalizedPhone || null,
       };
-      const { error } = await supabase
+      console.log("[Settings] save auth.uid:", user.id);
+      console.log("[Settings] save payload:", payload);
+      const { data: saved, error } = await supabase
         .from("business_settings")
         .upsert(
           { ...payload, owner_user_id: user.id } as any,
           { onConflict: "owner_user_id" },
-        );
+        )
+        .select()
+        .maybeSingle();
       if (typeof window !== "undefined") {
         const trimmed = demoAgentLabel.trim();
         if (trimmed) {
@@ -94,20 +98,27 @@ const Settings = () => {
         }
       }
       if (error) {
-        console.error("Settings save error", error);
+        console.error("[Settings] save error", error);
         toast.error(error.message || "Failed to save settings");
         return;
       }
-      if (normalizedPhone) setTwilioPhone(normalizedPhone);
+      console.log("[Settings] saved row:", saved);
+      if (saved) {
+        setBusinessName(saved.business_name || "");
+        setServiceArea((saved as any).service_area || "");
+        setServices(saved.services || []);
+        setTwilioPhone((saved as any).twilio_phone_number || "");
+      }
       await queryClient.invalidateQueries({ queryKey: ["business_settings"] });
       toast.success("Settings saved.");
     } catch (e: any) {
-      console.error("Settings save exception", e);
+      console.error("[Settings] save exception", e);
       toast.error(e?.message || "Failed to save settings");
     } finally {
       setSaving(false);
     }
   };
+
 
   if (isLoading) {
     return (
