@@ -444,6 +444,7 @@ serve(async (req) => {
           body: replyText,
           status: "pending_no_phone",
         });
+        if (isVoiceRequest) return twimlResponse(MISSED_TWIML);
         return new Response(
           JSON.stringify({ message: "ok" }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
