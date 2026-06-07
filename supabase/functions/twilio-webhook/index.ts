@@ -153,8 +153,6 @@ serve(async (req) => {
     // ignore — handled by downstream checks
   }
   const isVoiceRequest = !!params["CallSid"];
-  const ua = req.headers.get("user-agent") || "";
-  const looksLikeTwilio = isVoiceRequest || ua.includes("TwilioProxy");
 
   const failSafe = (status: number, jsonBody: Record<string, unknown>) => {
     if (isVoiceRequest) return twimlResponse(EMPTY_TWIML, 200);
