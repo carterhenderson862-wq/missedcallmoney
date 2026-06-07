@@ -483,7 +483,39 @@ serve(async (req) => {
     const twilioFrom = settings?.twilio_phone_number;
 
     if (isMissedCall) {
+      const callSid = params["CallSid"] || null;
       const replyText = `Hey—sorry we missed your call. What's going on, is this something urgent?`;
+
+      // Idempotency: if we've already processed this CallSid, do not double-send.
+      if (callSid) {
+        const { data: dupActivity } = await supabase
+          .from("admin_activity")
+          .select("id")
+          .eq("event_type", "sms_sent")
+          .filter("metadata->>call_sid", "eq", callSid)
+          .limit(1)
+          .maybeSingle();
+        if (dupActivity) {
+          console.log("skipped_duplicate_call", { call_sid: callSid, from: fromNumber });
+          await supabase.from("admin_activity").insert({
+            event_type: "skipped_duplicate_call",
+            actor_user_id: ownerUserId,
+            description: `Duplicate voice webhook for CallSid ${callSid}`,
+            metadata: { call_sid: callSid, from: fromNumber },
+          }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+          return twimlResponse(isVoiceRequest ? MISSED_TWIML : EMPTY_TWIML);
+        }
+      }
+
+      if (!existingLead && lead) {
+        console.log("lead_created", { lead_id: lead.id, call_sid: callSid, from: fromNumber });
+        await supabase.from("admin_activity").insert({
+          event_type: "lead_created",
+          actor_user_id: ownerUserId,
+          description: `Lead created from missed call ${fromNumber}`,
+          metadata: { lead_id: lead.id, call_sid: callSid, from: fromNumber, to: toNumber },
+        }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
+      }
 
       if (!twilioFrom) {
         await supabase.from("messages").insert({
@@ -511,8 +543,13 @@ serve(async (req) => {
       });
       const smsData = await smsResponse.json().catch(() => ({}));
       if (!smsResponse.ok) {
-        console.error("Twilio SMS error (missed-call reply):", smsResponse.status, smsData);
-        // Return 200 to prevent Twilio retry storms; the inbound is already recorded as a lead.
+        console.error("sms_send_failed", { status: smsResponse.status, data: smsData, call_sid: callSid });
+        await supabase.from("admin_activity").insert({
+          event_type: "sms_send_failed",
+          actor_user_id: ownerUserId,
+          description: `Missed-call SMS failed to ${fromNumber}`,
+          metadata: { lead_id: lead.id, call_sid: callSid, status: smsResponse.status, error: smsData },
+        }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
         return twimlResponse(isVoiceRequest ? MISSED_TWIML : EMPTY_TWIML);
       }
 
@@ -524,6 +561,14 @@ serve(async (req) => {
         twilio_sid: smsData.sid,
         status: "sent",
       });
+
+      console.log("sms_sent", { lead_id: lead.id, call_sid: callSid, to: fromNumber, sid: smsData.sid });
+      await supabase.from("admin_activity").insert({
+        event_type: "sms_sent",
+        actor_user_id: ownerUserId,
+        description: `Missed-call SMS sent to ${fromNumber}`,
+        metadata: { lead_id: lead.id, call_sid: callSid, to: fromNumber, sid: smsData.sid },
+      }).then(() => {}, (e) => console.warn("admin_activity log failed:", e));
 
       const updateData: Record<string, unknown> = { status: "contacted", follow_up_count: 0 };
       if (settings?.follow_up_enabled !== false) {
