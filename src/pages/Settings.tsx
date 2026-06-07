@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSettings } from "@/hooks/use-leads";
+import { useAuth } from "@/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Input } from "@/components/ui/input";
@@ -10,6 +12,8 @@ import { Save, Plus, X } from "lucide-react";
 
 const Settings = () => {
   const { data: settings, isLoading } = useSettings();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [businessName, setBusinessName] = useState("");
   const [serviceArea, setServiceArea] = useState("");
   const [services, setServices] = useState<string[]>([]);
@@ -55,7 +59,10 @@ const Settings = () => {
   const removeService = (s: string) => setServices(services.filter((x) => x !== s));
 
   const handleSave = async () => {
-    if (!settings?.id) return;
+    if (!user) {
+      toast.error("You must be signed in to save settings");
+      return;
+    }
     let normalizedPhone: string | null = "";
     if (twilioPhone.trim()) {
       normalizedPhone = normalizePhone(twilioPhone);
@@ -65,29 +72,45 @@ const Settings = () => {
       }
     }
     setSaving(true);
-    const { error } = await supabase
-      .from("business_settings")
-      .update({
-        business_name: businessName,
+    try {
+      const payload = {
+        business_name: businessName || "My Business",
         service_area: serviceArea,
         services,
         twilio_phone_number: normalizedPhone || null,
-      } as any)
-      .eq("id", settings.id);
-    if (typeof window !== "undefined") {
-      const trimmed = demoAgentLabel.trim();
-      if (trimmed) {
-        window.localStorage.setItem("demoAgentLabel", trimmed);
+      };
+      let error;
+      if (settings?.id) {
+        ({ error } = await supabase
+          .from("business_settings")
+          .update(payload as any)
+          .eq("id", settings.id));
       } else {
-        window.localStorage.removeItem("demoAgentLabel");
+        ({ error } = await supabase
+          .from("business_settings")
+          .insert({ ...payload, owner_user_id: user.id } as any));
       }
-    }
-    setSaving(false);
-    if (error) {
-      toast.error("Failed to save settings");
-    } else {
+      if (typeof window !== "undefined") {
+        const trimmed = demoAgentLabel.trim();
+        if (trimmed) {
+          window.localStorage.setItem("demoAgentLabel", trimmed);
+        } else {
+          window.localStorage.removeItem("demoAgentLabel");
+        }
+      }
+      if (error) {
+        console.error("Settings save error", error);
+        toast.error(error.message || "Failed to save settings");
+        return;
+      }
       if (normalizedPhone) setTwilioPhone(normalizedPhone);
-      toast.success("Settings saved");
+      await queryClient.invalidateQueries({ queryKey: ["business_settings"] });
+      toast.success("Settings saved.");
+    } catch (e: any) {
+      console.error("Settings save exception", e);
+      toast.error(e?.message || "Failed to save settings");
+    } finally {
+      setSaving(false);
     }
   };
 
