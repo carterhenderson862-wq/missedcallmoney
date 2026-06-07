@@ -15,13 +15,29 @@ const Settings = () => {
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
   const [demoAgentLabel, setDemoAgentLabel] = useState("");
+  const [twilioPhone, setTwilioPhone] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const normalizePhone = (raw: string): string | null => {
+    const cleaned = raw.replace(/[\s\-().]/g, "");
+    if (!cleaned) return "";
+    const withPlus = cleaned.startsWith("+")
+      ? cleaned
+      : cleaned.length === 11 && cleaned.startsWith("1")
+        ? `+${cleaned}`
+        : cleaned.length === 10
+          ? `+1${cleaned}`
+          : null;
+    if (!withPlus) return null;
+    return /^\+1\d{10}$/.test(withPlus) ? withPlus : null;
+  };
 
   useEffect(() => {
     if (settings) {
       setBusinessName(settings.business_name || "");
       setServiceArea((settings as any).service_area || "");
       setServices(settings.services || []);
+      setTwilioPhone((settings as any).twilio_phone_number || "");
     }
     if (typeof window !== "undefined") {
       setDemoAgentLabel(window.localStorage.getItem("demoAgentLabel") || "");
@@ -40,6 +56,14 @@ const Settings = () => {
 
   const handleSave = async () => {
     if (!settings?.id) return;
+    let normalizedPhone: string | null = "";
+    if (twilioPhone.trim()) {
+      normalizedPhone = normalizePhone(twilioPhone);
+      if (normalizedPhone === null) {
+        toast.error("Enter a valid phone in E.164 format, like +17372711871");
+        return;
+      }
+    }
     setSaving(true);
     const { error } = await supabase
       .from("business_settings")
@@ -47,6 +71,7 @@ const Settings = () => {
         business_name: businessName,
         service_area: serviceArea,
         services,
+        twilio_phone_number: normalizedPhone || null,
       } as any)
       .eq("id", settings.id);
     if (typeof window !== "undefined") {
@@ -61,6 +86,7 @@ const Settings = () => {
     if (error) {
       toast.error("Failed to save settings");
     } else {
+      if (normalizedPhone) setTwilioPhone(normalizedPhone);
       toast.success("Settings saved");
     }
   };
@@ -108,6 +134,21 @@ const Settings = () => {
               onChange={(e) => setServiceArea(e.target.value)}
             />
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="twilioPhone">CallRecover phone number</Label>
+            <Input
+              id="twilioPhone"
+              placeholder="+17372711871"
+              value={twilioPhone}
+              onChange={(e) => setTwilioPhone(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Enter the Twilio number assigned to this business. Use E.164 format, like +17372711871.
+            </p>
+          </div>
+
+
 
           <div className="space-y-2">
             <Label htmlFor="demoAgentLabel">Chat Demo Header Label (optional)</Label>
