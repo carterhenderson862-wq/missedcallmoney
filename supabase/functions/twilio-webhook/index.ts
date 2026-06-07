@@ -706,6 +706,9 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Webhook error:", error);
+    // If this looked like a Twilio voice request, return valid empty TwiML
+    // so the caller doesn't hear "an application error has occurred."
+    if (isVoiceRequest) return twimlResponse(EMPTY_TWIML, 200);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
