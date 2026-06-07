@@ -79,17 +79,12 @@ const Settings = () => {
         services,
         twilio_phone_number: normalizedPhone || null,
       };
-      let error;
-      if (settings?.id) {
-        ({ error } = await supabase
-          .from("business_settings")
-          .update(payload as any)
-          .eq("id", settings.id));
-      } else {
-        ({ error } = await supabase
-          .from("business_settings")
-          .insert({ ...payload, owner_user_id: user.id } as any));
-      }
+      const { error } = await supabase
+        .from("business_settings")
+        .upsert(
+          { ...payload, owner_user_id: user.id } as any,
+          { onConflict: "owner_user_id" },
+        );
       if (typeof window !== "undefined") {
         const trimmed = demoAgentLabel.trim();
         if (trimmed) {
