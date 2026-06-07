@@ -271,7 +271,7 @@ serve(async (req) => {
       .maybeSingle();
 
     if (!settings) {
-      console.warn(`No business found for Twilio number ${toNumber}`);
+      console.warn("business_not_found", { to: toNumber, call_sid: params["CallSid"] || null });
       // Return 200 so Twilio doesn't retry; this isn't an error worth retrying.
       // For voice, still return valid empty TwiML (not JSON).
       return twimlResponse(isVoiceRequest ? MISSED_TWIML : EMPTY_TWIML);
