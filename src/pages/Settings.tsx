@@ -37,6 +37,7 @@ const Settings = () => {
       setBusinessName(settings.business_name || "");
       setServiceArea((settings as any).service_area || "");
       setServices(settings.services || []);
+      setTwilioPhone((settings as any).twilio_phone_number || "");
     }
     if (typeof window !== "undefined") {
       setDemoAgentLabel(window.localStorage.getItem("demoAgentLabel") || "");
