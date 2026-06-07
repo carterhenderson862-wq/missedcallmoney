@@ -125,13 +125,27 @@ function validateTwilioSignature(
 }
 
 const EMPTY_TWIML = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
-const MISSED_TWIML = `<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Sorry we missed your call. We will text you shortly.</Say></Response>`;
+const MISSED_TWIML = `<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Sorry we missed your call. We will text you shortly.</Say><Pause length="1"/></Response>`;
 
 function twimlResponse(xml: string = EMPTY_TWIML, status = 200) {
   return new Response(xml, {
     status,
     headers: { ...corsHeaders, "Content-Type": "text/xml; charset=utf-8" },
   });
+}
+
+// A Twilio voice "status callback" reports the final disposition of a call
+// (completed/no-answer/busy/etc) and does NOT expect spoken TwiML. The
+// initial inbound call webhook arrives with CallStatus "ringing" or
+// "in-progress" (or sometimes absent) and Direction "inbound" — that's
+// where the caller is actually on the line and needs to hear something.
+function isInitialInboundVoice(p: Record<string, string>): boolean {
+  if (!p["CallSid"]) return false;
+  const status = (p["CallStatus"] || "").toLowerCase();
+  const direction = (p["Direction"] || "inbound").toLowerCase();
+  const initialStatus = status === "" || status === "ringing" || status === "in-progress";
+  const inboundDir = direction.startsWith("inbound");
+  return initialStatus && inboundDir;
 }
 
 serve(async (req) => {
@@ -153,9 +167,26 @@ serve(async (req) => {
     // ignore — handled by downstream checks
   }
   const isVoiceRequest = !!params["CallSid"];
+  const isInitialVoice = isInitialInboundVoice(params);
+
+  if (isVoiceRequest) {
+    console.log("Twilio voice webhook received", {
+      CallSid: params["CallSid"] || null,
+      CallStatus: params["CallStatus"] || null,
+      Direction: params["Direction"] || null,
+      From: params["From"] || null,
+      To: params["To"] || null,
+      isInitialInbound: isInitialVoice,
+    });
+  }
+
+  // For an initial inbound call the caller is on the line right now and
+  // must hear the Say/Pause TwiML even on error paths. For status
+  // callbacks (call already ended) empty TwiML is correct.
+  const voiceFallbackTwiml = () => isInitialVoice ? MISSED_TWIML : EMPTY_TWIML;
 
   const failSafe = (status: number, jsonBody: Record<string, unknown>) => {
-    if (isVoiceRequest) return twimlResponse(EMPTY_TWIML, 200);
+    if (isVoiceRequest) return twimlResponse(voiceFallbackTwiml(), 200);
     return new Response(JSON.stringify(jsonBody), {
       status,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
