@@ -569,8 +569,17 @@ serve(async (req) => {
       const statusCallbackUrl =
         (Deno.env.get("SUPABASE_URL") || "").replace(/\/+$/, "") + "/functions/v1/twilio-webhook";
 
+      const hasMessagingServiceSid = !!TWILIO_MESSAGING_SERVICE_SID;
+      const sendMode = hasMessagingServiceSid ? "messagingServiceSid" : "directFrom";
+      console.log("sms_routing", {
+        hasMessagingServiceSid,
+        messagingServiceSidPrefix: hasMessagingServiceSid ? TWILIO_MESSAGING_SERVICE_SID.substring(0, 6) : null,
+        sendMode,
+      });
+
       const smsParams = new URLSearchParams({ To: fromNumber, Body: replyText });
-      if (TWILIO_MESSAGING_SERVICE_SID) {
+      if (hasMessagingServiceSid) {
+        // When using a Messaging Service, do NOT include From — Twilio picks the sender.
         smsParams.set("MessagingServiceSid", TWILIO_MESSAGING_SERVICE_SID);
       } else {
         smsParams.set("From", twilioFrom!);
@@ -581,7 +590,9 @@ serve(async (req) => {
         lead_id: lead.id,
         call_sid: callSid,
         to: fromNumber,
-        from: TWILIO_MESSAGING_SERVICE_SID ? `MessagingService:${TWILIO_MESSAGING_SERVICE_SID}` : twilioFrom,
+        sendMode,
+        from: hasMessagingServiceSid ? null : twilioFrom,
+        messagingServiceSidPrefix: hasMessagingServiceSid ? TWILIO_MESSAGING_SERVICE_SID.substring(0, 6) : null,
       });
 
       const smsResponse = await fetch(`${GATEWAY_URL}/Messages.json`, {
