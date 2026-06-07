@@ -315,15 +315,13 @@ serve(async (req) => {
 
       if (insertError) {
         console.error("Failed to create lead:", insertError);
-        return new Response(JSON.stringify({ error: "Internal server error" }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return failSafe(500, { error: "Internal server error" });
       }
       lead = newLead;
     }
 
     if (!lead) {
+      if (isVoiceRequest) return twimlResponse(MISSED_TWIML);
       return new Response(JSON.stringify({ message: "ok" }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
