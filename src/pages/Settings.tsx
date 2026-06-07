@@ -15,7 +15,22 @@ const Settings = () => {
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
   const [demoAgentLabel, setDemoAgentLabel] = useState("");
+  const [twilioPhone, setTwilioPhone] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const normalizePhone = (raw: string): string | null => {
+    const cleaned = raw.replace(/[\s\-().]/g, "");
+    if (!cleaned) return "";
+    const withPlus = cleaned.startsWith("+")
+      ? cleaned
+      : cleaned.length === 11 && cleaned.startsWith("1")
+        ? `+${cleaned}`
+        : cleaned.length === 10
+          ? `+1${cleaned}`
+          : null;
+    if (!withPlus) return null;
+    return /^\+1\d{10}$/.test(withPlus) ? withPlus : null;
+  };
 
   useEffect(() => {
     if (settings) {
