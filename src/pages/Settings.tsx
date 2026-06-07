@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSettings } from "@/hooks/use-leads";
+import { useAuth } from "@/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import { Input } from "@/components/ui/input";
