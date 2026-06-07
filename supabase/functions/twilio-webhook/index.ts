@@ -220,15 +220,33 @@ serve(async (req) => {
       return failSafe(403, { error: "Forbidden" });
     }
 
-    // Twilio signs against the webhook URL it called. Honor x-forwarded-proto/host if present.
+    // Twilio signs against the webhook URL it called. The runtime URL we see
+    // here (req.url) is often the internal localhost URL, so we must rebuild
+    // the public URL. Try several candidates and accept any that validates.
     const proto = req.headers.get("x-forwarded-proto") || "https";
     const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
     const reqUrl = new URL(req.url);
-    const webhookUrl = `${proto}://${host}${reqUrl.pathname}${reqUrl.search}`;
+    const supabaseProjectUrl = (Deno.env.get("SUPABASE_URL") || "").replace(/\/+$/, "");
+    const candidates = new Set<string>();
+    if (host) candidates.add(`${proto}://${host}${reqUrl.pathname}${reqUrl.search}`);
+    if (supabaseProjectUrl) {
+      candidates.add(`${supabaseProjectUrl}/functions/v1/twilio-webhook`);
+      candidates.add(`${supabaseProjectUrl}/functions/v1/twilio-webhook/`);
+    }
+    candidates.add(req.url);
 
-    const valid = validateTwilioSignature(TWILIO_AUTH_TOKEN, webhookUrl, params, signature);
+    let valid = false;
+    for (const candidate of candidates) {
+      if (validateTwilioSignature(TWILIO_AUTH_TOKEN, candidate, params, signature)) {
+        valid = true;
+        break;
+      }
+    }
     if (!valid) {
-      console.warn("Rejected request: invalid Twilio signature");
+      console.warn("Rejected request: invalid Twilio signature", {
+        candidates: Array.from(candidates),
+        isVoiceRequest,
+      });
       return failSafe(403, { error: "Forbidden" });
     }
     // --- End signature validation ---
