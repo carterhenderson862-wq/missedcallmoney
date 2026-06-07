@@ -464,8 +464,7 @@ serve(async (req) => {
       if (!smsResponse.ok) {
         console.error("Twilio SMS error (missed-call reply):", smsResponse.status, smsData);
         // Return 200 to prevent Twilio retry storms; the inbound is already recorded as a lead.
-        const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response></Response>`;
-        return new Response(twiml, { headers: { ...corsHeaders, "Content-Type": "application/xml" } });
+        return twimlResponse(isVoiceRequest ? MISSED_TWIML : EMPTY_TWIML);
       }
 
       await supabase.from("messages").insert({
