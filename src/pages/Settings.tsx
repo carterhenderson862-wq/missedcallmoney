@@ -56,6 +56,14 @@ const Settings = () => {
 
   const handleSave = async () => {
     if (!settings?.id) return;
+    let normalizedPhone: string | null = "";
+    if (twilioPhone.trim()) {
+      normalizedPhone = normalizePhone(twilioPhone);
+      if (normalizedPhone === null) {
+        toast.error("Enter a valid phone in E.164 format, like +17372711871");
+        return;
+      }
+    }
     setSaving(true);
     const { error } = await supabase
       .from("business_settings")
@@ -63,6 +71,7 @@ const Settings = () => {
         business_name: businessName,
         service_area: serviceArea,
         services,
+        twilio_phone_number: normalizedPhone || null,
       } as any)
       .eq("id", settings.id);
     if (typeof window !== "undefined") {
@@ -77,6 +86,7 @@ const Settings = () => {
     if (error) {
       toast.error("Failed to save settings");
     } else {
+      if (normalizedPhone) setTwilioPhone(normalizedPhone);
       toast.success("Settings saved");
     }
   };
