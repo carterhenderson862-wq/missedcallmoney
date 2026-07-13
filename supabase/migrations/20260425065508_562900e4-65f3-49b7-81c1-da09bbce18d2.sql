@@ -197,7 +197,6 @@ CREATE TRIGGER on_lead_insert AFTER INSERT ON public.leads FOR EACH ROW EXECUTE 
 DROP TRIGGER IF EXISTS on_lead_update ON public.leads;
 CREATE TRIGGER on_lead_update AFTER UPDATE ON public.leads FOR EACH ROW EXECUTE FUNCTION public.log_lead_activity();
 
--- 10. Seed admin role for the designated email if user exists
-INSERT INTO public.user_roles (user_id, role)
-SELECT id, 'admin'::public.app_role FROM auth.users WHERE email = 'carterhenderson862@gmail.com'
-ON CONFLICT (user_id, role) DO NOTHING;
+-- 10. Admin role seeding removed. Admin roles are assigned directly in the
+-- database (out-of-band) and stored as data in public.user_roles. Never
+-- hardcode emails or admin grants in migration files.
