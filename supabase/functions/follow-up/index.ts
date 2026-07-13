@@ -8,11 +8,36 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
 
+// Each follow-up identifies the business — most recipients won't have the
+// number saved, and an anonymous "just checking in" reads as spam.
 const FOLLOW_UP_SEQUENCE = [
-  { message: "Hey—just checking back in. Still need help with this?", delayToNextMs: 55 * 60 * 1000 },
-  { message: "We can get someone out today or tomorrow—want me to lock that in?", delayToNextMs: 23 * 60 * 60 * 1000 },
-  { message: "Following up—do you still need help or should I close this out?", delayToNextMs: null },
+  { message: (biz: string) => `hey, it's ${biz} — just checking back in. still need help with this?`, delayToNextMs: 55 * 60 * 1000 },
+  { message: (biz: string) => `${biz} here — we can get someone out to you, want me to lock in a time?`, delayToNextMs: 23 * 60 * 60 * 1000 },
+  { message: (biz: string) => `last check-in from ${biz} — still need help, or should I close this out?`, delayToNextMs: null },
 ];
+
+// TCPA-safe quiet hours: no automated follow-up texts before 8am or after
+// 9pm in the business's local timezone (defaults to Central / Austin market).
+const QUIET_START_HOUR = 21; // 9pm
+const QUIET_END_HOUR = 8; // 8am
+const DEFAULT_TIMEZONE = "America/Chicago";
+
+function localHour(timezone: string): number {
+  try {
+    const h = new Intl.DateTimeFormat("en-US", { timeZone: timezone, hour: "numeric", hour12: false }).format(new Date());
+    return parseInt(h, 10) % 24;
+  } catch (_e) {
+    return new Date().getUTCHours();
+  }
+}
+
+// If we're inside quiet hours, return an ISO timestamp for the next 8am local.
+function deferUntilMorning(timezone: string): string | null {
+  const hour = localHour(timezone);
+  if (hour >= QUIET_END_HOUR && hour < QUIET_START_HOUR) return null; // OK to send now
+  const hoursUntil8am = hour >= QUIET_START_HOUR ? (24 - hour) + QUIET_END_HOUR : QUIET_END_HOUR - hour;
+  return new Date(Date.now() + hoursUntil8am * 60 * 60 * 1000).toISOString();
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -94,9 +119,20 @@ serve(async (req) => {
       }
 
       const step = FOLLOW_UP_SEQUENCE[stepIndex];
-      const replyText = step.message;
       const settings = await getSettings(lead.owner_user_id);
       const twilioFrom = settings?.twilio_phone_number as string | undefined;
+      const bizName = (settings?.business_name as string) || "our team";
+      const replyText = step.message(bizName);
+
+      // Quiet hours: don't text people in the middle of the night. Defer the
+      // follow-up to the next morning without consuming a sequence step.
+      const timezone = (settings?.timezone as string) || DEFAULT_TIMEZONE;
+      const deferredUntil = deferUntilMorning(timezone);
+      if (deferredUntil) {
+        await supabase.from("leads").update({ next_follow_up_at: deferredUntil }).eq("id", lead.id);
+        results.push({ leadId: lead.id, status: "deferred_quiet_hours" });
+        continue;
+      }
 
       // Global opt-out check — never message a phone number on the opt-out list.
       const { data: optOut } = await supabase
