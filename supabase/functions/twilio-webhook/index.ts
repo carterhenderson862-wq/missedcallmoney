@@ -10,6 +10,13 @@ const corsHeaders = {
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/twilio";
 
+// Conversation quality lives or dies on this model. Flash-tier models are
+// cheap but noticeably stiffer in dialogue — if replies feel robotic, upgrade
+// CHAT_MODEL to a stronger model available on the Lovable AI gateway.
+// EXTRACT_MODEL stays on flash: structured extraction is easy and high-volume.
+const CHAT_MODEL = "google/gemini-3-flash-preview";
+const EXTRACT_MODEL = "google/gemini-3-flash-preview";
+
 const MAX_SMS_BODY_LEN = 1600;
 
 const ALLOWED_STATUSES = ["new", "responded", "qualifying", "booking", "booked", "no_response", "lost"] as const;
@@ -73,8 +80,11 @@ const BOOKING_AFFIRMATIVES = [
   /\bperfect\b/, /\bgo ahead\b/, /\bdo it\b/,
 ];
 function customerConfirmedBooking(text: string): boolean {
-  const t = text.toLowerCase().trim();
+  let t = text.toLowerCase().trim();
   if (!t) return false;
+  // Strip enthusiastic idioms that contain negation words before checking.
+  // "sounds good, can't wait!" must confirm, not block.
+  t = t.replace(/can'?t wait/g, "").replace(/no problem/g, "").replace(/no worries/g, "");
   // Any negation/deferral phrase blocks confirmation, even if affirmatives are present.
   if (BOOKING_NEGATIONS.some((re) => re.test(t))) return false;
   return BOOKING_AFFIRMATIVES.some((re) => re.test(t));
@@ -485,11 +495,18 @@ serve(async (req) => {
         leadUpdate.status = respondedNext;
       }
       if (isUrgent) leadUpdate.urgency = "high";
+      // Single-trade business: the service type is self-evident — never ask.
+      const settingsServices = (settings?.services as string[]) || [];
+      if (!lead.service_type && settingsServices.length === 1) {
+        leadUpdate.service_type = settingsServices[0].toLowerCase();
+      }
       leadUpdate.next_follow_up_at = null;
       leadUpdate.follow_up_count = 0;
       if (Object.keys(leadUpdate).length > 0) {
         await supabase.from("leads").update(leadUpdate).eq("id", lead.id);
         if (leadUpdate.status) lead.status = leadUpdate.status as string;
+        if (leadUpdate.urgency) lead.urgency = leadUpdate.urgency as string;
+        if (leadUpdate.service_type) lead.service_type = leadUpdate.service_type as string;
       }
     }
 
@@ -698,33 +715,54 @@ serve(async (req) => {
 
     // (legacy keyword fast-track removed — dispatcher checklist below drives flow)
 
-    // Build dispatcher checklist of what's still missing on this lead
+    // Build dispatcher checklist of what's still missing on this lead.
+    // Deliberately lean: every extra question costs conversions over SMS.
+    // - service_type is only asked when the business runs multiple trades AND
+    //   the issue doesn't make it obvious (single-trade is auto-filled above).
+    // - urgency is inferred from the issue description, not asked separately,
+    //   unless nothing about timing is known when it's time to book.
+    // - customer_name is NOT a gating question — it's folded into the final
+    //   booking confirmation so it never adds a standalone round-trip.
+    const multiTrade = ((settings?.services as string[]) || []).length > 1;
+    const hasIssue = !!lead.job_details && Object.keys((lead.job_details as Record<string, unknown>) || {}).length > 0;
+
     const missing: string[] = [];
-    if (!lead.service_type) missing.push("service_type (plumbing/HVAC/roofing/electrical/other)");
-    if (!lead.urgency) missing.push("urgency (urgent vs scheduled)");
-    if (!lead.job_details || Object.keys((lead.job_details as Record<string, unknown>) || {}).length === 0) missing.push("issue (what exactly is wrong)");
+    if (!hasIssue) missing.push("issue (what exactly is wrong)");
+    if (!lead.service_type && multiTrade && hasIssue) missing.push("service_type (which trade this falls under — only if genuinely unclear from the issue)");
     if (!lead.location) missing.push("location (area or address)");
-    if (!lead.customer_name) missing.push("customer_name");
     if (!lead.booked_slot) missing.push("preferred_time");
 
     const nextNeeded = missing[0] || null;
+    const needsName = !lead.customer_name;
 
-    if (isUrgent && !lead.urgency) {
+    if (isUrgent) {
       aiMessages.push({
         role: "system",
-        content: "URGENT JOB DETECTED. Acknowledge urgency in 1 short sentence, then ask the next missing detail. Example: 'Got it — we'll treat this as urgent. Are you available now or later today?' 1-2 sentences max.",
+        content: "URGENT JOB DETECTED. Acknowledge the urgency in a short empathetic clause, then ask the next missing detail. Example: 'oh no — ok, we'll treat this as urgent. what area are you in?' 1-2 sentences max.",
       });
     }
+
+    // Concrete availability the AI is allowed to offer. If none is configured,
+    // it must NEVER invent time windows.
+    const slotList = Array.isArray(settings?.available_slots) ? (settings!.available_slots as unknown[]) : [];
+    const slotGuidance = slotList.length > 0
+      ? `When offering booking, offer exactly TWO of these real windows: ${JSON.stringify(slotList)}.`
+      : `No availability windows are configured. NEVER invent or promise a specific time window. Instead ask what day/time works best for them and say the team will confirm the exact window.`;
 
     if (nextNeeded) {
       aiMessages.push({
         role: "system",
-        content: `DISPATCHER CHECKLIST: Ask ONE question to capture: ${nextNeeded}. Do NOT ask anything already collected. Keep it to 1 sentence, natural and contractor-like. Examples by field:\n- service_type: "Is this for plumbing, HVAC, roofing, electrical, or something else?"\n- issue: "What's the issue exactly?"\n- location: "What area or address is this for?"\n- customer_name: "What's your name so we can put it with the request?"\n- preferred_time: "Want the earliest available, or is there a time that works best?"`,
+        content: `DISPATCHER CHECKLIST: Ask ONE question to capture: ${nextNeeded}. Do NOT ask anything already collected — check the conversation first. If the customer's message already answered it, move to the next missing item instead. Keep it to 1 short sentence, natural and contractor-like. Examples by field:\n- issue: "what's going on with it exactly?"\n- service_type: only ask if truly ambiguous, e.g. "is that more of a plumbing thing or electrical?"\n- location: "what area are you in?"\n- preferred_time: ${slotList.length > 0 ? `offer two of the real windows above, e.g. "we could do {window A} or {window B} — which works?"` : `"what day and time works best for you? I'll have the team confirm the exact window."`}\n${slotGuidance}`,
+      });
+    } else if (needsName) {
+      aiMessages.push({
+        role: "system",
+        content: "ALL JOB DETAILS COLLECTED — only the name is missing. Ask for it as part of wrapping up, in ONE message: e.g. 'perfect — what name should I put this under and I'll get you locked in?' Do NOT ask anything else.",
       });
     } else {
       aiMessages.push({
         role: "system",
-        content: "ALL DETAILS COLLECTED. Confirm booking intent in 1 sentence: 'Perfect — I'll mark this as ready to book and have the team confirm shortly.' Do NOT ask more questions.",
+        content: "ALL DETAILS COLLECTED. Confirm in 1 sentence that they're locked in and the team will confirm shortly, e.g. 'perfect, you're all set — the team will text to confirm shortly.' Do NOT ask more questions.",
       });
     }
 
@@ -735,7 +773,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: CHAT_MODEL,
         messages: aiMessages,
       }),
     });
@@ -814,7 +852,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: EXTRACT_MODEL,
           messages: [
             {
               role: "system",
@@ -959,5 +997,7 @@ RULES:
 OPENING MESSAGE (already sent automatically):
 "hey, this is ${bizName} — sorry we just missed your call. what's going on?"
 
-AVAILABLE SLOTS: ${JSON.stringify(slots)}`;
+AVAILABLE SLOTS: ${Array.isArray(slots) && (slots as unknown[]).length > 0
+    ? JSON.stringify(slots)
+    : "none configured — NEVER invent or promise a specific time window; ask what works for the customer and say the team will confirm the exact window"}`;
 }
