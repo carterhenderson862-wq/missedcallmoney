@@ -510,7 +510,8 @@ serve(async (req) => {
 
     if (isMissedCall) {
       const callSid = params["CallSid"] || null;
-      const replyText = `Hey—sorry we missed your call. What's going on, is this something urgent?`;
+      const bizNameForOpen = (settings?.business_name as string) || "our team";
+      const replyText = `hey, this is ${bizNameForOpen} — sorry we just missed your call. what's going on?`;
 
       // Idempotency: if we've already processed this CallSid, do not double-send.
       if (callSid) {
