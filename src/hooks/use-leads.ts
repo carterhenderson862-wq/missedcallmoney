@@ -113,6 +113,7 @@ export function useSettings() {
       const { data, error } = await supabase
         .from("business_settings")
         .select("*")
+        .eq("owner_user_id", user!.id)
         .maybeSingle();
       if (error) throw error;
       return data;
