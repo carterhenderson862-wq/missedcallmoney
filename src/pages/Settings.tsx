@@ -255,9 +255,74 @@ const Settings = () => {
             </p>
           </div>
 
-
-
           <div className="space-y-2">
+            <Label htmlFor="avgJobValue">Average Job Value ($)</Label>
+            <Input
+              id="avgJobValue"
+              type="number"
+              min={1}
+              step={25}
+              value={avgJobValue}
+              onChange={(e) => setAvgJobValue(Number(e.target.value) || 350)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Used to calculate recovered revenue on your dashboard. Most home-service jobs range from $200–$600.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Business Hours</Label>
+            <p className="text-xs text-muted-foreground -mt-1">
+              The AI uses these when scheduling. Uncheck a day to mark it closed.
+            </p>
+            <div className="space-y-2">
+              {DAYS.map((d) => (
+                <div key={d.key} className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id={`hrs-${d.key}`}
+                    checked={hours[d.key].enabled}
+                    onChange={(e) =>
+                      setHours((h) => ({
+                        ...h,
+                        [d.key]: { ...h[d.key], enabled: e.target.checked },
+                      }))
+                    }
+                    className="w-4 h-4 rounded border-border accent-primary"
+                  />
+                  <Label htmlFor={`hrs-${d.key}`} className="w-24 text-sm font-normal cursor-pointer">
+                    {d.label}
+                  </Label>
+                  <Input
+                    type="time"
+                    value={hours[d.key].open}
+                    disabled={!hours[d.key].enabled}
+                    onChange={(e) =>
+                      setHours((h) => ({
+                        ...h,
+                        [d.key]: { ...h[d.key], open: e.target.value },
+                      }))
+                    }
+                    className="w-32"
+                  />
+                  <span className="text-muted-foreground text-sm">to</span>
+                  <Input
+                    type="time"
+                    value={hours[d.key].close}
+                    disabled={!hours[d.key].enabled}
+                    onChange={(e) =>
+                      setHours((h) => ({
+                        ...h,
+                        [d.key]: { ...h[d.key], close: e.target.value },
+                      }))
+                    }
+                    className="w-32"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
             <Label htmlFor="demoAgentLabel">Chat Demo Header Label (optional)</Label>
             <Input
               id="demoAgentLabel"
