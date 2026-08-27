@@ -110,10 +110,17 @@ const Settings = () => {
       }
       console.log("[Settings] saved row:", saved);
       if (saved) {
-        setBusinessName(saved.business_name || "");
-        setServiceArea((saved as any).service_area || "");
-        setServices(saved.services || []);
-        setTwilioPhone((saved as any).twilio_phone_number || "");
+        // Guard: only repopulate from a row we actually own. RLS should already
+        // block cross-owner upserts, but never trust the returned row blindly.
+        if (saved.owner_user_id && user && saved.owner_user_id === user.id) {
+          setBusinessName(saved.business_name || "");
+          setServiceArea((saved as any).service_area || "");
+          setServices(saved.services || []);
+          setTwilioPhone((saved as any).twilio_phone_number || "");
+        } else {
+          console.error("[Settings] saved row owner mismatch", saved.owner_user_id, user?.id);
+          toast.error("Could not verify ownership of the saved settings.");
+        }
       }
       await queryClient.invalidateQueries({ queryKey: ["business_settings"] });
       toast.success("Settings saved.");
