@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSettings } from "@/hooks/use-leads";
+import { useSettings, type BusinessHours } from "@/hooks/use-leads";
 import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,42 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Save, Plus, X } from "lucide-react";
+
+const DAYS = [
+  { key: "mon", label: "Monday" },
+  { key: "tue", label: "Tuesday" },
+  { key: "wed", label: "Wednesday" },
+  { key: "thu", label: "Thursday" },
+  { key: "fri", label: "Friday" },
+  { key: "sat", label: "Saturday" },
+  { key: "sun", label: "Sunday" },
+] as const;
+
+type DayHours = { enabled: boolean; open: string; close: string };
+
+const emptyHours: Record<string, DayHours> = Object.fromEntries(
+  DAYS.map((d) => [d.key, { enabled: false, open: "08:00", close: "17:00" }]),
+);
+
+function settingsToDayHours(raw: BusinessHours): Record<string, DayHours> {
+  const result: Record<string, DayHours> = { ...emptyHours };
+  for (const d of DAYS) {
+    const entry = raw?.[d.key];
+    if (entry && entry.open && entry.close) {
+      result[d.key] = { enabled: true, open: entry.open, close: entry.close };
+    }
+  }
+  return result;
+}
+
+function dayHoursToSettings(h: Record<string, DayHours>): BusinessHours {
+  const out: BusinessHours = {};
+  for (const d of DAYS) {
+    const v = h[d.key];
+    if (v?.enabled) out[d.key] = { open: v.open, close: v.close };
+  }
+  return out;
+}
 
 const Settings = () => {
   const { data: settings, isLoading, isError, error } = useSettings();
@@ -20,6 +56,8 @@ const Settings = () => {
   const [newService, setNewService] = useState("");
   const [demoAgentLabel, setDemoAgentLabel] = useState("");
   const [twilioPhone, setTwilioPhone] = useState("");
+  const [avgJobValue, setAvgJobValue] = useState(350);
+  const [hours, setHours] = useState<Record<string, DayHours>>({ ...emptyHours });
   const [saving, setSaving] = useState(false);
 
   // Guard: never render another owner's business settings. If RLS denies
