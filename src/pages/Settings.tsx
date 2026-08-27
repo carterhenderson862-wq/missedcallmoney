@@ -124,6 +124,8 @@ const Settings = () => {
         service_area: serviceArea,
         services,
         twilio_phone_number: normalizedPhone || null,
+        avg_job_value: avgJobValue || 350,
+        business_hours: dayHoursToSettings(hours),
       };
       console.log("[Settings] save auth.uid:", user.id);
       console.log("[Settings] save payload:", payload);
