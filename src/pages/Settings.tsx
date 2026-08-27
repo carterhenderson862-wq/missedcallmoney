@@ -142,6 +142,27 @@ const Settings = () => {
     );
   }
 
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DashboardHeader />
+        <div className="container max-w-xl py-16 text-center space-y-4">
+          <h1 className="font-display text-2xl font-bold text-foreground">
+            Settings unavailable
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            We couldn't load your business settings. This usually means your
+            session expired or your account doesn't have access to these
+            settings. Please sign back in and try again.
+          </p>
+          <Button variant="outline" onClick={() => (window.location.href = "/auth")}>
+            Sign in again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader />
