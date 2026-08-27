@@ -1,21 +1,44 @@
-import { PhoneMissed, CalendarCheck, MessageSquare, DollarSign, TrendingUp, AlertTriangle } from "lucide-react";
-import { isToday } from "date-fns";
+import { useState } from "react";
+import { PhoneMissed, CalendarCheck, MessageSquare, AlertTriangle, TrendingUp } from "lucide-react";
+import { isToday, isWithinInterval, subDays, startOfDay } from "date-fns";
 import type { Lead } from "@/hooks/use-leads";
+import { cn } from "@/lib/utils";
 
 interface StatsBarProps {
   leads: Lead[];
+  avgJobValue?: number;
 }
 
-const AVG_JOB_VALUE = 350;
+type RangeKey = "today" | "7d" | "30d" | "all";
 
-const StatsBar = ({ leads }: StatsBarProps) => {
-  const missedCalls = leads.filter((l) => l.source === "missed_call").length;
-  const missedToday = leads.filter((l) => l.source === "missed_call" && isToday(new Date(l.created_at))).length;
-  const engaged = leads.filter((l) => ["responded", "qualifying", "booking", "booked"].includes(l.status)).length;
-  const booked = leads.filter((l) => l.status === "booked").length;
-  const lost = leads.filter((l) => ["lost", "no_response"].includes(l.status)).length;
-  const recoveredRevenue = booked * AVG_JOB_VALUE;
-  const lostRevenue = lost * AVG_JOB_VALUE;
+const RANGES: { key: RangeKey; label: string }[] = [
+  { key: "today", label: "Today" },
+  { key: "7d", label: "7 days" },
+  { key: "30d", label: "30 days" },
+  { key: "all", label: "All time" },
+];
+
+function filterByRange(leads: Lead[], range: RangeKey): Lead[] {
+  if (range === "all") return leads;
+  if (range === "today") return leads.filter((l) => isToday(new Date(l.created_at)));
+  const days = range === "7d" ? 7 : 30;
+  const cutoff = startOfDay(subDays(new Date(), days));
+  return leads.filter((l) =>
+    isWithinInterval(new Date(l.created_at), { start: cutoff, end: new Date() }),
+  );
+}
+
+const StatsBar = ({ leads, avgJobValue = 350 }: StatsBarProps) => {
+  const [range, setRange] = useState<RangeKey>("all");
+
+  const filtered = filterByRange(leads, range);
+  const missedCalls = filtered.filter((l) => l.source === "missed_call").length;
+  const missedToday = filtered.filter((l) => l.source === "missed_call" && isToday(new Date(l.created_at))).length;
+  const engaged = filtered.filter((l) => ["responded", "qualifying", "booking", "booked"].includes(l.status)).length;
+  const booked = filtered.filter((l) => l.status === "booked").length;
+  const lost = filtered.filter((l) => ["lost", "no_response"].includes(l.status)).length;
+  const recoveredRevenue = booked * avgJobValue;
+  const lostRevenue = lost * avgJobValue;
 
   const stats = [
     { label: "Missed Calls", value: missedCalls, icon: PhoneMissed, color: "text-primary" },
@@ -26,6 +49,24 @@ const StatsBar = ({ leads }: StatsBarProps) => {
 
   return (
     <div className="space-y-4">
+      {/* Time-range toggle */}
+      <div className="flex items-center gap-1.5 flex-wrap">
+        {RANGES.map((r) => (
+          <button
+            key={r.key}
+            onClick={() => setRange(r.key)}
+            className={cn(
+              "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+              range === r.key
+                ? "bg-primary text-primary-foreground"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {r.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {stats.map((stat) => (
           <div key={stat.label} className="rounded-xl border border-border bg-card p-4">
@@ -44,7 +85,7 @@ const StatsBar = ({ leads }: StatsBarProps) => {
           <PhoneMissed className="w-5 h-5 text-destructive shrink-0" />
           <p className="text-sm text-foreground">
             You missed <span className="font-bold text-destructive">{missedToday} call{missedToday !== 1 ? "s" : ""}</span> today
-            {" "}— estimated lost revenue: <span className="font-bold text-destructive">${(missedToday * AVG_JOB_VALUE).toLocaleString()}</span> if not recovered.
+            {" "}— estimated lost revenue: <span className="font-bold text-destructive">${(missedToday * avgJobValue).toLocaleString()}</span> if not recovered.
           </p>
         </div>
       )}

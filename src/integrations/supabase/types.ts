@@ -45,6 +45,8 @@ export type Database = {
         Row: {
           ai_system_prompt: string | null
           available_slots: Json | null
+          avg_job_value: number
+          business_hours: Json
           business_name: string
           created_at: string
           follow_up_enabled: boolean | null
@@ -60,6 +62,8 @@ export type Database = {
         Insert: {
           ai_system_prompt?: string | null
           available_slots?: Json | null
+          avg_job_value?: number
+          business_hours?: Json
           business_name?: string
           created_at?: string
           follow_up_enabled?: boolean | null
@@ -75,6 +79,8 @@ export type Database = {
         Update: {
           ai_system_prompt?: string | null
           available_slots?: Json | null
+          avg_job_value?: number
+          business_hours?: Json
           business_name?: string
           created_at?: string
           follow_up_enabled?: boolean | null
@@ -96,6 +102,7 @@ export type Database = {
           created_at: string
           customer_name: string | null
           follow_up_count: number | null
+          human_taken_over: boolean
           id: string
           job_details: Json | null
           location: string | null
@@ -114,6 +121,7 @@ export type Database = {
           created_at?: string
           customer_name?: string | null
           follow_up_count?: number | null
+          human_taken_over?: boolean
           id?: string
           job_details?: Json | null
           location?: string | null
@@ -132,6 +140,7 @@ export type Database = {
           created_at?: string
           customer_name?: string | null
           follow_up_count?: number | null
+          human_taken_over?: boolean
           id?: string
           job_details?: Json | null
           location?: string | null

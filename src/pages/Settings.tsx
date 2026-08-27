@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSettings } from "@/hooks/use-leads";
+import { useSettings, type BusinessHours } from "@/hooks/use-leads";
 import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,42 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Save, Plus, X } from "lucide-react";
+
+const DAYS = [
+  { key: "mon", label: "Monday" },
+  { key: "tue", label: "Tuesday" },
+  { key: "wed", label: "Wednesday" },
+  { key: "thu", label: "Thursday" },
+  { key: "fri", label: "Friday" },
+  { key: "sat", label: "Saturday" },
+  { key: "sun", label: "Sunday" },
+] as const;
+
+type DayHours = { enabled: boolean; open: string; close: string };
+
+const emptyHours: Record<string, DayHours> = Object.fromEntries(
+  DAYS.map((d) => [d.key, { enabled: false, open: "08:00", close: "17:00" }]),
+);
+
+function settingsToDayHours(raw: BusinessHours): Record<string, DayHours> {
+  const result: Record<string, DayHours> = { ...emptyHours };
+  for (const d of DAYS) {
+    const entry = raw?.[d.key];
+    if (entry && entry.open && entry.close) {
+      result[d.key] = { enabled: true, open: entry.open, close: entry.close };
+    }
+  }
+  return result;
+}
+
+function dayHoursToSettings(h: Record<string, DayHours>): BusinessHours {
+  const out: BusinessHours = {};
+  for (const d of DAYS) {
+    const v = h[d.key];
+    if (v?.enabled) out[d.key] = { open: v.open, close: v.close };
+  }
+  return out;
+}
 
 const Settings = () => {
   const { data: settings, isLoading, isError, error } = useSettings();
@@ -20,6 +56,8 @@ const Settings = () => {
   const [newService, setNewService] = useState("");
   const [demoAgentLabel, setDemoAgentLabel] = useState("");
   const [twilioPhone, setTwilioPhone] = useState("");
+  const [avgJobValue, setAvgJobValue] = useState(350);
+  const [hours, setHours] = useState<Record<string, DayHours>>({ ...emptyHours });
   const [saving, setSaving] = useState(false);
 
   // Guard: never render another owner's business settings. If RLS denies
@@ -45,9 +83,11 @@ const Settings = () => {
   useEffect(() => {
     if (settings) {
       setBusinessName(settings.business_name || "");
-      setServiceArea((settings as any).service_area || "");
+      setServiceArea(settings.service_area || "");
       setServices(settings.services || []);
-      setTwilioPhone((settings as any).twilio_phone_number || "");
+      setTwilioPhone(settings.twilio_phone_number || "");
+      setAvgJobValue(settings.avg_job_value ?? 350);
+      setHours(settingsToDayHours(settings.business_hours || {}));
     }
     if (typeof window !== "undefined") {
       setDemoAgentLabel(window.localStorage.getItem("demoAgentLabel") || "");
@@ -84,6 +124,8 @@ const Settings = () => {
         service_area: serviceArea,
         services,
         twilio_phone_number: normalizedPhone || null,
+        avg_job_value: avgJobValue || 350,
+        business_hours: dayHoursToSettings(hours),
       };
       console.log("[Settings] save auth.uid:", user.id);
       console.log("[Settings] save payload:", payload);
@@ -114,9 +156,11 @@ const Settings = () => {
         // block cross-owner upserts, but never trust the returned row blindly.
         if (saved.owner_user_id && user && saved.owner_user_id === user.id) {
           setBusinessName(saved.business_name || "");
-          setServiceArea((saved as any).service_area || "");
+          setServiceArea(saved.service_area || "");
           setServices(saved.services || []);
-          setTwilioPhone((saved as any).twilio_phone_number || "");
+          setTwilioPhone(saved.twilio_phone_number || "");
+          setAvgJobValue(saved.avg_job_value ?? 350);
+          setHours(settingsToDayHours(saved.business_hours || {}));
         } else {
           console.error("[Settings] saved row owner mismatch", saved.owner_user_id, user?.id);
           toast.error("Could not verify ownership of the saved settings.");
@@ -211,9 +255,74 @@ const Settings = () => {
             </p>
           </div>
 
-
-
           <div className="space-y-2">
+            <Label htmlFor="avgJobValue">Average Job Value ($)</Label>
+            <Input
+              id="avgJobValue"
+              type="number"
+              min={1}
+              step={25}
+              value={avgJobValue}
+              onChange={(e) => setAvgJobValue(Number(e.target.value) || 350)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Used to calculate recovered revenue on your dashboard. Most home-service jobs range from $200–$600.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Business Hours</Label>
+            <p className="text-xs text-muted-foreground -mt-1">
+              The AI uses these when scheduling. Uncheck a day to mark it closed.
+            </p>
+            <div className="space-y-2">
+              {DAYS.map((d) => (
+                <div key={d.key} className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id={`hrs-${d.key}`}
+                    checked={hours[d.key].enabled}
+                    onChange={(e) =>
+                      setHours((h) => ({
+                        ...h,
+                        [d.key]: { ...h[d.key], enabled: e.target.checked },
+                      }))
+                    }
+                    className="w-4 h-4 rounded border-border accent-primary"
+                  />
+                  <Label htmlFor={`hrs-${d.key}`} className="w-24 text-sm font-normal cursor-pointer">
+                    {d.label}
+                  </Label>
+                  <Input
+                    type="time"
+                    value={hours[d.key].open}
+                    disabled={!hours[d.key].enabled}
+                    onChange={(e) =>
+                      setHours((h) => ({
+                        ...h,
+                        [d.key]: { ...h[d.key], open: e.target.value },
+                      }))
+                    }
+                    className="w-32"
+                  />
+                  <span className="text-muted-foreground text-sm">to</span>
+                  <Input
+                    type="time"
+                    value={hours[d.key].close}
+                    disabled={!hours[d.key].enabled}
+                    onChange={(e) =>
+                      setHours((h) => ({
+                        ...h,
+                        [d.key]: { ...h[d.key], close: e.target.value },
+                      }))
+                    }
+                    className="w-32"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
             <Label htmlFor="demoAgentLabel">Chat Demo Header Label (optional)</Label>
             <Input
               id="demoAgentLabel"
