@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Save, Plus, X } from "lucide-react";
 
 const Settings = () => {
-  const { data: settings, isLoading } = useSettings();
+  const { data: settings, isLoading, isError, error } = useSettings();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [businessName, setBusinessName] = useState("");
@@ -21,6 +21,12 @@ const Settings = () => {
   const [demoAgentLabel, setDemoAgentLabel] = useState("");
   const [twilioPhone, setTwilioPhone] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Guard: never render another owner's business settings. If RLS denies
+  // access (or the fetched row doesn't belong to the signed-in user), show a
+  // friendly message instead of the form.
+  const accessDenied =
+    isError || (!!settings && !!user && settings.owner_user_id !== user.id);
 
   const normalizePhone = (raw: string): string | null => {
     const cleaned = raw.replace(/[\s\-().]/g, "");
