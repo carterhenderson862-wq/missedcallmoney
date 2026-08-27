@@ -156,9 +156,11 @@ const Settings = () => {
         // block cross-owner upserts, but never trust the returned row blindly.
         if (saved.owner_user_id && user && saved.owner_user_id === user.id) {
           setBusinessName(saved.business_name || "");
-          setServiceArea((saved as any).service_area || "");
+          setServiceArea(saved.service_area || "");
           setServices(saved.services || []);
-          setTwilioPhone((saved as any).twilio_phone_number || "");
+          setTwilioPhone(saved.twilio_phone_number || "");
+          setAvgJobValue(saved.avg_job_value ?? 350);
+          setHours(settingsToDayHours(saved.business_hours || {}));
         } else {
           console.error("[Settings] saved row owner mismatch", saved.owner_user_id, user?.id);
           toast.error("Could not verify ownership of the saved settings.");
