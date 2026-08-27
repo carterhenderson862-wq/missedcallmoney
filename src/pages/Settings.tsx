@@ -83,9 +83,11 @@ const Settings = () => {
   useEffect(() => {
     if (settings) {
       setBusinessName(settings.business_name || "");
-      setServiceArea((settings as any).service_area || "");
+      setServiceArea(settings.service_area || "");
       setServices(settings.services || []);
-      setTwilioPhone((settings as any).twilio_phone_number || "");
+      setTwilioPhone(settings.twilio_phone_number || "");
+      setAvgJobValue(settings.avg_job_value ?? 350);
+      setHours(settingsToDayHours(settings.business_hours || {}));
     }
     if (typeof window !== "undefined") {
       setDemoAgentLabel(window.localStorage.getItem("demoAgentLabel") || "");
