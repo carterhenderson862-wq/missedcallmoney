@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Save, Plus, X } from "lucide-react";
 
 const Settings = () => {
-  const { data: settings, isLoading } = useSettings();
+  const { data: settings, isLoading, isError, error } = useSettings();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [businessName, setBusinessName] = useState("");
@@ -21,6 +21,12 @@ const Settings = () => {
   const [demoAgentLabel, setDemoAgentLabel] = useState("");
   const [twilioPhone, setTwilioPhone] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Guard: never render another owner's business settings. If RLS denies
+  // access (or the fetched row doesn't belong to the signed-in user), show a
+  // friendly message instead of the form.
+  const accessDenied =
+    isError || (!!settings && !!user && settings.owner_user_id !== user.id);
 
   const normalizePhone = (raw: string): string | null => {
     const cleaned = raw.replace(/[\s\-().]/g, "");
@@ -104,10 +110,17 @@ const Settings = () => {
       }
       console.log("[Settings] saved row:", saved);
       if (saved) {
-        setBusinessName(saved.business_name || "");
-        setServiceArea((saved as any).service_area || "");
-        setServices(saved.services || []);
-        setTwilioPhone((saved as any).twilio_phone_number || "");
+        // Guard: only repopulate from a row we actually own. RLS should already
+        // block cross-owner upserts, but never trust the returned row blindly.
+        if (saved.owner_user_id && user && saved.owner_user_id === user.id) {
+          setBusinessName(saved.business_name || "");
+          setServiceArea((saved as any).service_area || "");
+          setServices(saved.services || []);
+          setTwilioPhone((saved as any).twilio_phone_number || "");
+        } else {
+          console.error("[Settings] saved row owner mismatch", saved.owner_user_id, user?.id);
+          toast.error("Could not verify ownership of the saved settings.");
+        }
       }
       await queryClient.invalidateQueries({ queryKey: ["business_settings"] });
       toast.success("Settings saved.");
@@ -125,6 +138,27 @@ const Settings = () => {
       <div className="min-h-screen bg-background">
         <DashboardHeader />
         <div className="container py-12 text-center text-muted-foreground">Loading…</div>
+      </div>
+    );
+  }
+
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DashboardHeader />
+        <div className="container max-w-xl py-16 text-center space-y-4">
+          <h1 className="font-display text-2xl font-bold text-foreground">
+            Settings unavailable
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            We couldn't load your business settings. This usually means your
+            session expired or your account doesn't have access to these
+            settings. Please sign back in and try again.
+          </p>
+          <Button variant="outline" onClick={() => (window.location.href = "/auth")}>
+            Sign in again
+          </Button>
+        </div>
       </div>
     );
   }
