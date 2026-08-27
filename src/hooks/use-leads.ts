@@ -140,7 +140,7 @@ export function useSettings() {
         .eq("owner_user_id", user!.id)
         .maybeSingle();
       if (error) throw error;
-      return data;
+      return data as BusinessSettings | null;
     },
     enabled: !!user,
   });
