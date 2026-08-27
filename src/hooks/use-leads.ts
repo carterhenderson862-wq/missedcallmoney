@@ -17,6 +17,30 @@ export type Lead = {
   booked_slot: string | null;
   follow_up_count: number | null;
   next_follow_up_at: string | null;
+  human_taken_over: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessHours = Record<
+  string,
+  { open: string; close: string } | null
+>;
+
+export type BusinessSettings = {
+  id: string;
+  owner_user_id: string;
+  business_name: string;
+  twilio_phone_number: string | null;
+  service_area: string | null;
+  services: string[] | null;
+  avg_job_value: number;
+  business_hours: BusinessHours;
+  available_slots: unknown;
+  ai_system_prompt: string | null;
+  follow_up_enabled: boolean | null;
+  follow_up_interval_hours: number | null;
+  max_follow_ups: number | null;
   created_at: string;
   updated_at: string;
 };
