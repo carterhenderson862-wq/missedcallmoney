@@ -323,6 +323,7 @@ const Settings = () => {
             </div>
           </div>
 
+          <div className="space-y-2">
             <Label htmlFor="demoAgentLabel">Chat Demo Header Label (optional)</Label>
             <Input
               id="demoAgentLabel"
