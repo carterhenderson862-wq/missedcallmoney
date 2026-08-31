@@ -87,7 +87,7 @@ const Settings = () => {
       setServices(settings.services || []);
       setTwilioPhone(settings.twilio_phone_number || "");
       setAvgJobValue(settings.avg_job_value ?? 350);
-      setHours(settingsToDayHours(settings.business_hours || {}));
+      setHours(settingsToDayHours((settings.business_hours || {}) as BusinessHours));
     }
     if (typeof window !== "undefined") {
       setDemoAgentLabel(window.localStorage.getItem("demoAgentLabel") || "");
