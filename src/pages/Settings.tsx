@@ -87,7 +87,7 @@ const Settings = () => {
       setServices(settings.services || []);
       setTwilioPhone(settings.twilio_phone_number || "");
       setAvgJobValue(settings.avg_job_value ?? 350);
-      setHours(settingsToDayHours(settings.business_hours || {}));
+      setHours(settingsToDayHours((settings.business_hours || {}) as BusinessHours));
     }
     if (typeof window !== "undefined") {
       setDemoAgentLabel(window.localStorage.getItem("demoAgentLabel") || "");
@@ -160,7 +160,7 @@ const Settings = () => {
           setServices(saved.services || []);
           setTwilioPhone(saved.twilio_phone_number || "");
           setAvgJobValue(saved.avg_job_value ?? 350);
-          setHours(settingsToDayHours(saved.business_hours || {}));
+          setHours(settingsToDayHours((saved.business_hours || {}) as BusinessHours));
         } else {
           console.error("[Settings] saved row owner mismatch", saved.owner_user_id, user?.id);
           toast.error("Could not verify ownership of the saved settings.");
@@ -323,6 +323,7 @@ const Settings = () => {
             </div>
           </div>
 
+          <div className="space-y-2">
             <Label htmlFor="demoAgentLabel">Chat Demo Header Label (optional)</Label>
             <Input
               id="demoAgentLabel"

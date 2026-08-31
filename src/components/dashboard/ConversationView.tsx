@@ -67,7 +67,7 @@ const ConversationView = ({ lead, messages }: ConversationViewProps) => {
     try {
       const { error } = await supabase
         .from("leads")
-        .update({ status: newStatus })
+        .update({ status: newStatus as never })
         .eq("id", lead.id);
       if (error) throw error;
       toast.success(`Status changed to ${newStatus.replace("_", " ")}`);
